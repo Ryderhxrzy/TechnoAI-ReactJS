@@ -5,6 +5,7 @@ import logo from '../assets/images/logo.png';
 import { useState, useEffect, useRef } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import Swal from 'sweetalert2';
 
 function Register(props) {
     const [theme, setTheme] = useState(() => {
@@ -12,9 +13,11 @@ function Register(props) {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const passwordRef = useRef(null);
     const confirmPasswordRef = useRef(null);
+    const countdownTimerRef = useRef(null);
 
     useEffect(() => {
         const savedTheme = localStorage.getItem("theme") || "light";
@@ -27,11 +30,19 @@ function Register(props) {
         localStorage.setItem("theme", theme);
     }, [theme]);
 
+    // Cleanup timer on component unmount
+    useEffect(() => {
+        return () => {
+            if (countdownTimerRef.current) {
+                clearInterval(countdownTimerRef.current);
+            }
+        };
+    }, []);
+
     const toggleTheme = () => {
         setTheme((prev) => (prev === "dark" ? "light" : "dark"));
     };
 
-    // Copying the same toggle logic from Login.jsx
     const togglePassword = () => {
         setShowPassword((prev) => !prev);
         if (passwordRef.current) {
@@ -46,40 +57,220 @@ function Register(props) {
         }
     };
 
-    const handleGoogleSuccess = (credentialResponse) => {
-        const token = credentialResponse.credential;
-        const user = jwtDecode(token);
+    const redirectToLogin = () => {
+    console.log('Redirecting to login...'); // Add this for debugging
+    localStorage.removeItem('userInfo');
+    props.onNavigateToLogin();
+};
 
-        console.log("Google Signup User:", user);
+// Custom SweetAlert configuration with countdown timer
+const showSuccessAlert = () => {
+    return new Promise((resolve) => {
+        let timeLeft = 5;
 
-        const signupData = {
-            ...user,
-            signup_method: 'google',
-            signup_date: new Date().toISOString()
-        };
+        Swal.fire({
+            title: '🎉 Account Created Successfully!',
+            html: `Redirecting to login in <strong>${timeLeft}</strong> seconds...`,
+            icon: 'success',
+            showCancelButton: false,
+            confirmButtonText: `Continue to Login (${timeLeft})`,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            background: 'var(--bg-elevated)',
+            color: 'var(--text-primary)',
+            didOpen: () => {
+                const confirmButton = Swal.getConfirmButton();
+                const htmlContainer = Swal.getHtmlContainer();
 
-        localStorage.setItem('userInfo', JSON.stringify(signupData));
-        props.onRegisterSuccess();
+                // Interval to update countdown every second
+                countdownTimerRef.current = setInterval(() => {
+                    timeLeft--;
+
+                    if (htmlContainer) {
+                        htmlContainer.innerHTML = `Redirecting to login in <strong>${timeLeft}</strong> seconds...`;
+                    }
+
+                    if (confirmButton) {
+                        confirmButton.textContent = `Continue to Login (${timeLeft})`;
+                    }
+
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownTimerRef.current);
+                        countdownTimerRef.current = null;
+                        Swal.close(); // Automatically close when countdown ends
+                    }
+                }, 1000);
+            },
+            willClose: () => {
+                // Clear interval when alert is closed
+                if (countdownTimerRef.current) {
+                    clearInterval(countdownTimerRef.current);
+                    countdownTimerRef.current = null;
+                }
+            }
+        }).then(() => {
+            // Redirect after alert closes (either manually or timer ends)
+            redirectToLogin();
+            resolve();
+        });
+    });
+};
+
+
+    // Regular alert for errors (without timer)
+    const showErrorAlert = (title, text, icon = 'error') => {
+        return Swal.fire({
+            title,
+            text,
+            icon,
+            confirmButtonText: 'OK',
+            customClass: {
+                popup: 'register-swal',
+                title: 'register-swal-title',
+                htmlContainer: 'register-swal-content',
+                actions: 'register-swal-actions',
+                confirmButton: 'register-swal-confirm'
+            },
+            buttonsStyling: false,
+            background: 'var(--bg-elevated)',
+            color: 'var(--text-primary)',
+            width: 'auto',
+            padding: '1.5rem',
+            borderRadius: '8px'
+        });
+    };
+
+    // Function to register user in MongoDB
+    const registerUserInDB = async (userData) => {
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Registration failed');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Registration error:', error);
+            throw error;
+        }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setIsLoading(true);
+
+        try {
+            const token = credentialResponse.credential;
+            const user = jwtDecode(token);
+
+            console.log("Google Signup User:", user);
+
+            const signupData = {
+                full_name: user.name || `${user.given_name} ${user.family_name}`.trim(),
+                email: user.email,
+                profile: user.picture,
+                method: 'google',
+            };
+
+            // Register user in MongoDB
+            const result = await registerUserInDB(signupData);
+
+            if (result.success) {
+                console.log('Google registration successful:', result);
+                
+                // Show success message with countdown timer
+                await showSuccessAlert();
+            }
+        } catch (error) {
+            console.error("Google registration failed:", error);
+            await showErrorAlert(
+                '❌ Registration Failed', 
+                error.message || 'Google registration failed. Please try again.'
+            );
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleGoogleError = () => {
         console.error("Google Signup Failed");
+        showErrorAlert(
+            '❌ Google Signup Failed', 
+            'Google signup failed. Please try again.'
+        );
     };
 
-    const handleRegularSignup = (e) => {
+    const handleRegularSignup = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
         
         const formData = new FormData(e.target);
+        const password = formData.get('password');
+        const confirmPassword = formData.get('confirmPassword');
+
+        // Validate passwords match
+        if (password !== confirmPassword) {
+            await showErrorAlert(
+                '🔒 Password Mismatch', 
+                'Passwords do not match. Please make sure both passwords are identical.',
+                'warning'
+            );
+            setIsLoading(false);
+            return;
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            await showErrorAlert(
+                '🔒 Password Too Short', 
+                'Password must be at least 6 characters long for security.',
+                'warning'
+            );
+            setIsLoading(false);
+            return;
+        }
+
         const userData = {
-            fullname: formData.get('fullname'),
+            full_name: formData.get('fullname'),
             email: formData.get('email'),
-            password: formData.get('password'),
-            signup_method: 'email',
-            signup_date: new Date().toISOString()
+            password: password,
+            method: 'email',
         };
-        
-        localStorage.setItem('userInfo', JSON.stringify(userData));
-        props.onRegisterSuccess();
+
+        try {
+            // Register user in MongoDB
+            const result = await registerUserInDB(userData);
+
+            if (result.success) {
+                console.log('Email registration successful:', result);
+                
+                // Show success message with countdown timer
+                await showSuccessAlert();
+            }
+        } catch (error) {
+            console.error("Registration failed:", error);
+            
+            // Handle specific error cases
+            let errorMessage = error.message || 'Registration failed. Please try again.';
+            if (errorMessage.includes('already exists') || errorMessage.includes('duplicate')) {
+                errorMessage = 'An account with this email already exists. Please try logging in or use a different email.';
+            }
+            
+            await showErrorAlert(
+                '❌ Registration Failed', 
+                errorMessage
+            );
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -101,13 +292,16 @@ function Register(props) {
                 </div>
 
                 <form className="login-form" onSubmit={handleRegularSignup}>
-                    <GoogleLogin
-                        onSuccess={handleGoogleSuccess}
-                        onError={handleGoogleError}
-                        theme={theme === "dark" ? "filled_black" : "outline"}
-                        size="large"
-                        text="signup_with"
-                    />
+                    <div className="google-login-wrapper">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={handleGoogleError}
+                            theme={theme === "dark" ? "filled_black" : "outline"}
+                            size="large"
+                            text="signup_with"
+                            disabled={isLoading}
+                        />
+                    </div>
 
                     <div className="divider">
                         <span>or</span>
@@ -122,6 +316,7 @@ function Register(props) {
                             className="form-input" 
                             placeholder='Enter your full name' 
                             required 
+                            disabled={isLoading}
                         />
                     </div>
 
@@ -134,6 +329,7 @@ function Register(props) {
                             className="form-input" 
                             placeholder='Enter your email' 
                             required 
+                            disabled={isLoading}
                         />
                     </div>
 
@@ -146,14 +342,17 @@ function Register(props) {
                                 name="password" 
                                 id="password" 
                                 className="form-input" 
-                                placeholder='Create a password' 
+                                placeholder='Create a password (min. 6 characters)' 
                                 required 
+                                disabled={isLoading}
+                                minLength="6"
                             />
                             <button 
                                 type="button" 
                                 onClick={togglePassword} 
                                 className="password-toggle" 
                                 aria-label='Toggle password visibility'
+                                disabled={isLoading}
                             >
                                 <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} id="password-icon"></i>
                             </button>
@@ -171,12 +370,15 @@ function Register(props) {
                                 className="form-input" 
                                 placeholder='Confirm your password' 
                                 required 
+                                disabled={isLoading}
+                                minLength="6"
                             />
                             <button 
                                 type="button" 
                                 onClick={toggleConfirmPassword} 
                                 className="password-toggle" 
                                 aria-label='Toggle confirm password visibility'
+                                disabled={isLoading}
                             >
                                 <i className={showConfirmPassword ? "fas fa-eye-slash" : "fas fa-eye"} id="confirm-password-icon"></i>
                             </button>
@@ -185,14 +387,23 @@ function Register(props) {
 
                     <div className="form-options">
                         <label className="remember-me">
-                            <input type="checkbox" name="terms" id="terms" required />
+                            <input type="checkbox" name="terms" id="terms" required disabled={isLoading} />
                             <span>I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a></span>
                         </label>
                     </div>
 
-                    <button type="submit" className="btn btn-primary">
-                        <i className="fas fa-user-plus"></i>
-                        Create Account
+                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <i className="fas fa-spinner fa-spin"></i>
+                                Creating Account...
+                            </>
+                        ) : (
+                            <>
+                                <i className="fas fa-user-plus"></i>
+                                Create Account
+                            </>
+                        )}
                     </button>
 
                     <div className="register-link">
@@ -201,6 +412,7 @@ function Register(props) {
                                 type="button" 
                                 className="link-button"
                                 onClick={props.onNavigateToLogin}
+                                disabled={isLoading}
                             >
                                 Sign in
                             </button>

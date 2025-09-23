@@ -1,4 +1,128 @@
 /* SweetAlert Customization */
+/* Register SweetAlert Customization */
+.register-swal {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border-primary) !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+  width: auto !important;
+  max-width: 420px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+.register-swal-title {
+  color: var(--text-primary) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin: 0 0 0.5rem 0 !important;
+  padding: 0 !important;
+  text-align: center !important;
+  line-height: 1.4 !important;
+}
+
+.register-swal-content {
+  color: var(--text-secondary) !important;
+  margin: 0 0 1.5rem 0 !important;
+  padding: 0 !important;
+  font-size: 1rem !important;
+  text-align: center !important;
+  line-height: 1.5 !important;
+}
+
+.register-swal-actions {
+  gap: 0.75rem !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-wrap: nowrap !important;
+}
+
+.register-swal-confirm {
+  background: var(--accent-primary) !important;
+  color: white !important;
+  border-radius: 6px !important;
+  padding: 0.625rem 1.5rem !important;
+  margin: 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+  min-width: 120px !important;
+  height: auto !important;
+}
+
+.register-swal-confirm:hover {
+  background: var(--accent-hover) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.register-swal-cancel {
+  background: var(--accent-light) !important;
+  color: var(--text-primary) !important;
+  border-radius: 6px !important;
+  padding: 0.625rem 1.5rem !important;
+  margin: 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+  min-width: 120px !important;
+  height: auto !important;
+}
+
+.register-swal-cancel:hover {
+  background: var(--accent-light-hover) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* SweetAlert icon customization */
+.swal2-icon.swal2-success {
+  color: var(--success-color) !important;
+  border-color: var(--success-color) !important;
+}
+
+.swal2-icon.swal2-error {
+  color: var(--error-color) !important;
+  border-color: var(--error-color) !important;
+}
+
+.swal2-icon.swal2-warning {
+  color: var(--warning-color) !important;
+  border-color: var(--warning-color) !important;
+}
+
+.swal2-icon.swal2-info {
+  color: var(--info-color) !important;
+  border-color: var(--info-color) !important;
+}
+
+/* Animation removal for smoother transitions */
+.swal2-noanimation {
+  animation: none !important;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .register-swal {
+    margin: 1rem !important;
+    max-width: calc(100vw - 2rem) !important;
+    padding: 1.25rem !important;
+  }
+  
+  .register-swal-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  
+  .register-swal-confirm,
+  .register-swal-cancel {
+    width: 100% !important;
+    min-width: auto !important;
+  }
+}
+
 .swal2-popup.logout-swal {
   background: var(--bg-elevated) !important;
   border: 1px solid var(--border-primary) !important;

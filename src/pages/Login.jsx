@@ -87,13 +87,15 @@ function Login(props) {
                 </div>
 
                 <form className="login-form" id="loginForm" method="post">
-                    <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={handleGoogleError}
-                    theme={theme === "dark" ? "filled_black" : "outline"}
-                    size="large"
-                    />
-
+                    <div className="google-login-wrapper">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={handleGoogleError}
+                            theme={theme === "dark" ? "filled_black" : "outline"}
+                            size="large"
+                        />
+                    </div>
+                    
                     <div className="divider"><span>or</span></div>
 
                     <div className="form-group">
