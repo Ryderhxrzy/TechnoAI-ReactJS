@@ -1,4 +1,6 @@
-import '../assets/styles/Login&Register.css';
+import '../assets/styles/LoginRegister.css';
+import '../assets/styles/sweetalert.css';
+import '../assets/styles/styles.css';
 
 function Login() {
     return (
