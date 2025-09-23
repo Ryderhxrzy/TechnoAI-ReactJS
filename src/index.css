@@ -1,68 +1,138 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Light mode colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #ebeff5;
+  --bg-elevated: #f6f8fa;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --bg-input: #eff1f3;
+  --utility-button-bg: #EEEEEE;
+  
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a5568;
+  --text-tertiary: #718096;
+  --text-muted: #a0aec0;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  --text-icon: #a0aec0;
+  --text-bg: #0f0c05a8;
+  
+  --border-primary: #e2e8f0;
+  --border-secondary: #d0d9e6;
+  --border-focus: #4299e1;
+  
+  --accent-primary: #0085d1;
+  --accent-hover: #0095f0;
+  --sub-accent: #0084d18c;
+  
+  --accent-light: #e0e6ed;
+  --accent-light-hover: #d0d8e3;  
+  --accent-border: #c2ccd6;
+  
+  --success: #38a169;
+  --warning: #d69e2e;
+  --error: #e53e3e;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  --icon-size: 17px !important;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  
+  /* Code theme */
+  --code-bg: #2d3748;
+  --code-text: #e2e8f0;
+  --code-header-bg: #1a202c;
+  --code-header-text: #f7fafc;
+  --code-border: #4a5568;
+  
+  /* Scrollbar */
+  --scrollbar-track: #edf2f7;
+  --scrollbar-thumb: #cbd5e0;
+  --scrollbar-thumb-hover: #a0aec0;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* Dark mode colors */
+[data-theme="dark"] {
+  --bg-primary: #1E1E1E;
+  --bg-secondary: #22272e;
+  --bg-tertiary: #4a5568;
+  --bg-elevated: #1c2128;
+
+  --bg-input: #2b3136;
+  --bg-user-message: #2e353f;
+
+  --text-primary: #E0E0E0;
+  --text-secondary: #A0A0A0;
+  --text-tertiary: #cbd5e0;
+  --text-muted: #a0aec0;
+  --text-links: #90CAF9;
+
+  --text-icon: #718096;
+  --text-bg: #f8be4aa8;
+  
+  --border-primary: #333333;
+  --border-secondary: #333333;
+  --border-focus: #5641f5;
+  
+  --accent-primary: #0085d1;
+  --accent-hover: #0095f0;
+
+  --accent-light: #2b3136;
+  --accent-light-hover: #364147;
+  --accent-border: #3d464d;
+  --accent-icons: #;
+  
+  --success: #68d391;
+  --warning: #f6ad55;
+  --error: #fc8181;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(0, 0, 0, 0.2);
+  
+  /* Code theme - slightly brighter for dark mode */
+  --code-bg: #2d3748;
+  --code-text: #f7fafc;
+  --code-header-bg: #1a202c;
+  --code-header-text: #ffffff;
+  --code-border: #4a5568;
+  
+  /* Scrollbar */
+  --scrollbar-track: #2d3748;
+  --scrollbar-thumb: #4a5568;
+  --scrollbar-thumb-hover: #718096;
+
+  --profile-avatar-color: white; /* New variable for avatar text */
+  --button-text-color: white;    /* New variable for button text */
+  
+  /* Profile section fixes */
+  .user-profile {
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-primary);
   }
-  a:hover {
-    color: #747bff;
+  
+  .profile-avatar {
+    background: var(--accent-primary);
+    color: var(--profile-avatar-color) !important;
   }
+  
+  /* Button fixes */
+  .new-chat-btn,
+  .action-btn,
+  #send-btn,
+  .header-minimizer,
+  .sidebar-minimizer,
+  .mobile-menu-btn {
+    color: var(--button-text-color) !important;
+  }
+  .new-chat-btn i,
+  .sidebar-minimizer i,
+  .mobile-menu-btn i {
+    color: var(--button-text-color) !important;
+  }
+  
+  /* Ensure white text in buttons */
   button {
-    background-color: #f9f9f9;
+    color: var(--button-text-color);
   }
 }

@@ -13,7 +13,7 @@ body {
 
         /* Login Container */
         .login-container {
-            width: 100%;
+            width: 700px;
             max-width: 400px;
             background: var(--bg-elevated);
             border-radius: 16px;
@@ -247,6 +247,20 @@ body {
             height: 16px;
             accent-color: var(--accent-primary);
         }
+
+        .link-button {
+    background: none;
+    border: none;
+    color: var(--accent-primary);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 5px;
+    font: inherit;
+}
+
+.link-button:hover {
+    color: var(--accent-hover);
+}
 
         .forgot-password {
             color: var(--accent-primary);
