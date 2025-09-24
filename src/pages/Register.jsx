@@ -30,7 +30,6 @@ function Register(props) {
         localStorage.setItem("theme", theme);
     }, [theme]);
 
-    // Cleanup timer on component unmount
     useEffect(() => {
         return () => {
             if (countdownTimerRef.current) {
@@ -58,66 +57,60 @@ function Register(props) {
     };
 
     const redirectToLogin = () => {
-    console.log('Redirecting to login...'); // Add this for debugging
-    localStorage.removeItem('userInfo');
-    props.onNavigateToLogin();
-};
+        console.log('Redirecting to login...');
+        localStorage.removeItem('userInfo');
+        props.onNavigateToLogin();
+    };
 
-// Custom SweetAlert configuration with countdown timer
-const showSuccessAlert = () => {
-    return new Promise((resolve) => {
-        let timeLeft = 5;
+    const showSuccessAlert = () => {
+        return new Promise((resolve) => {
+            let timeLeft = 5;
 
-        Swal.fire({
-            title: '🎉 Account Created Successfully!',
-            html: `Redirecting to login in <strong>${timeLeft}</strong> seconds...`,
-            icon: 'success',
-            showCancelButton: false,
-            confirmButtonText: `Continue to Login (${timeLeft})`,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            background: 'var(--bg-elevated)',
-            color: 'var(--text-primary)',
-            didOpen: () => {
-                const confirmButton = Swal.getConfirmButton();
-                const htmlContainer = Swal.getHtmlContainer();
+            Swal.fire({
+                title: '🎉 Account Created Successfully!',
+                html: `Redirecting to login in <strong>${timeLeft}</strong> seconds...`,
+                icon: 'success',
+                showCancelButton: false,
+                confirmButtonText: `Continue to Login (${timeLeft})`,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                background: 'var(--bg-elevated)',
+                color: 'var(--text-primary)',
+                didOpen: () => {
+                    const confirmButton = Swal.getConfirmButton();
+                    const htmlContainer = Swal.getHtmlContainer();
 
-                // Interval to update countdown every second
-                countdownTimerRef.current = setInterval(() => {
-                    timeLeft--;
+                    countdownTimerRef.current = setInterval(() => {
+                        timeLeft--;
 
-                    if (htmlContainer) {
-                        htmlContainer.innerHTML = `Redirecting to login in <strong>${timeLeft}</strong> seconds...`;
-                    }
+                        if (htmlContainer) {
+                            htmlContainer.innerHTML = `Redirecting to login in <strong>${timeLeft}</strong> seconds...`;
+                        }
 
-                    if (confirmButton) {
-                        confirmButton.textContent = `Continue to Login (${timeLeft})`;
-                    }
+                        if (confirmButton) {
+                            confirmButton.textContent = `Continue to Login (${timeLeft})`;
+                        }
 
-                    if (timeLeft <= 0) {
+                        if (timeLeft <= 0) {
+                            clearInterval(countdownTimerRef.current);
+                            countdownTimerRef.current = null;
+                            Swal.close();
+                        }
+                    }, 1000);
+                },
+                willClose: () => {
+                    if (countdownTimerRef.current) {
                         clearInterval(countdownTimerRef.current);
                         countdownTimerRef.current = null;
-                        Swal.close(); // Automatically close when countdown ends
                     }
-                }, 1000);
-            },
-            willClose: () => {
-                // Clear interval when alert is closed
-                if (countdownTimerRef.current) {
-                    clearInterval(countdownTimerRef.current);
-                    countdownTimerRef.current = null;
                 }
-            }
-        }).then(() => {
-            // Redirect after alert closes (either manually or timer ends)
-            redirectToLogin();
-            resolve();
+            }).then(() => {
+                redirectToLogin();
+                resolve();
+            });
         });
-    });
-};
+    };
 
-
-    // Regular alert for errors (without timer)
     const showErrorAlert = (title, text, icon = 'error') => {
         return Swal.fire({
             title,
@@ -140,7 +133,6 @@ const showSuccessAlert = () => {
         });
     };
 
-    // Function to register user in MongoDB
     const registerUserInDB = async (userData) => {
         try {
             const response = await fetch('http://localhost:5000/api/auth/register', {
@@ -216,7 +208,6 @@ const showSuccessAlert = () => {
         const password = formData.get('password');
         const confirmPassword = formData.get('confirmPassword');
 
-        // Validate passwords match
         if (password !== confirmPassword) {
             await showErrorAlert(
                 '🔒 Password Mismatch', 
@@ -227,7 +218,6 @@ const showSuccessAlert = () => {
             return;
         }
 
-        // Validate password length
         if (password.length < 6) {
             await showErrorAlert(
                 '🔒 Password Too Short', 
