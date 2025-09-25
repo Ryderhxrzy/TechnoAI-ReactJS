@@ -48,6 +48,99 @@ router.get('/test', (req, res) => {
   res.json({ message: 'Auth routes are working!' });
 });
 
+// Google login/register endpoint
+router.post('/google', async (req, res) => {
+  try {
+    const { full_name, email, profile, method } = req.body;
+
+    // Validate required fields
+    if (!full_name || !email || !method) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Full name, email, and method are required' 
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid email format' 
+      });
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email: email.toLowerCase() });
+    
+    if (user) {
+      // User exists, return user data
+      return res.json({
+        success: true,
+        message: 'Login successful',
+        user: {
+          id: user._id,
+          full_name: user.full_name,
+          email: user.email,
+          profile: user.profile,
+          method: user.method,
+          created_at: user.created_at
+        }
+      });
+    } else {
+      // Create new user for Google login
+      const newUser = new User({
+        full_name: full_name.trim(),
+        email: email.toLowerCase().trim(),
+        password: null, // No password for Google users
+        profile: profile || null,
+        method: 'google',
+        created_at: new Date()
+      });
+
+      const savedUser = await newUser.save();
+
+      return res.status(201).json({
+        success: true,
+        message: 'User registered successfully',
+        user: {
+          id: savedUser._id,
+          full_name: savedUser.full_name,
+          email: savedUser.email,
+          profile: savedUser.profile,
+          method: savedUser.method,
+          created_at: savedUser.created_at
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error('Google auth error:', error);
+    
+    // Handle duplicate key error
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists'
+      });
+    }
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: messages.join('. ')
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
 // Register endpoint
 router.post('/register', async (req, res) => {
   try {
@@ -144,7 +237,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login endpoint (optional - for future use)
+// Login endpoint
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
