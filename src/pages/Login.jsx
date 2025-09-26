@@ -6,7 +6,7 @@ import logo from '../assets/images/logo.png';
 import { useState, useEffect, useRef } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
-import Home from './Home'; // Import Home instead of Profile
+import Home from './Home';
 import Swal from 'sweetalert2';
 
 function Login(props) {
@@ -27,7 +27,7 @@ function Login(props) {
 
         const savedUserInfo = localStorage.getItem('userInfo');
         if (savedUserInfo) {
-            setCurrentPage('home'); // Changed from 'profile' to 'home'
+            setCurrentPage('home');
         }
     }, []);
 
@@ -35,6 +35,27 @@ function Login(props) {
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem("theme", theme);
     }, [theme]);
+
+    // Custom SweetAlert configuration function matching your design
+    const showCustomAlert = (icon, title, text, confirmButtonText = 'OK') => {
+        return Swal.fire({
+            icon: icon,
+            title: title,
+            text: text,
+            confirmButtonText: confirmButtonText,
+            customClass: {
+                popup: 'login-swal',
+                title: 'login-swal-title',
+                htmlContainer: 'login-swal-content',
+                confirmButton: 'login-swal-confirm',
+                cancelButton: 'login-swal-cancel',
+                actions: 'login-swal-actions'
+            },
+            buttonsStyling: false,
+            background: 'var(--bg-elevated)',
+            color: 'var(--text-primary)'
+        });
+    };
 
     const toggleTheme = () => {
         setTheme((prev) => (prev === "dark" ? "light" : "dark"));
@@ -55,7 +76,6 @@ function Login(props) {
 
             console.log("Google User:", user);
 
-            // Send Google user data to backend
             const response = await fetch('http://localhost:5000/api/auth/google', {
                 method: 'POST',
                 headers: {
@@ -74,21 +94,16 @@ function Login(props) {
             if (data.success) {
                 localStorage.setItem('userInfo', JSON.stringify(data.user));
                 props.onLoginSuccess();
-                setCurrentPage('home'); // Changed from 'profile' to 'home'
+                setCurrentPage('home');
+                
+                // Success message with custom styling
+                showCustomAlert('success', 'Welcome!', 'You have successfully logged in.');
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Login Failed',
-                    text: data.message || 'Google login failed'
-                });
+                showCustomAlert('error', 'Login Failed', data.message || 'Google login failed');
             }
         } catch (error) {
             console.error("Google login error:", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong during Google login'
-            });
+            showCustomAlert('error', 'Error', 'Something went wrong during Google login');
         } finally {
             setIsLoading(false);
         }
@@ -96,11 +111,7 @@ function Login(props) {
 
     const handleGoogleError = () => {
         console.error("Google Login Failed");
-        Swal.fire({
-            icon: 'error',
-            title: 'Google Login Failed',
-            text: 'Please try again'
-        });
+        showCustomAlert('error', 'Google Login Failed', 'Please try again');
     };
 
     const handleEmailLogin = async (e) => {
@@ -110,11 +121,7 @@ function Login(props) {
         const password = passwordRef.current?.value;
 
         if (!email || !password) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Missing Fields',
-                text: 'Please enter both email and password'
-            });
+            showCustomAlert('warning', 'Missing Fields', 'Please enter both email and password');
             return;
         }
 
@@ -134,21 +141,16 @@ function Login(props) {
             if (data.success) {
                 localStorage.setItem('userInfo', JSON.stringify(data.user));
                 props.onLoginSuccess();
-                setCurrentPage('home'); // Changed from 'profile' to 'home'
+                setCurrentPage('home');
+                
+                // Success message with custom styling
+                showCustomAlert('success', 'Welcome Back!', 'You have successfully logged in.');
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Login Failed',
-                    text: data.message || 'Invalid credentials'
-                });
+                showCustomAlert('error', 'Login Failed', data.message || 'Invalid credentials');
             }
         } catch (error) {
             console.error("Email login error:", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong during login'
-            });
+            showCustomAlert('error', 'Error', 'Something went wrong during login');
         } finally {
             setIsLoading(false);
         }
@@ -158,7 +160,7 @@ function Login(props) {
         return <Register />;
     }
 
-    if (currentPage === 'home') { // Changed from 'profile' to 'home'
+    if (currentPage === 'home') {
         return <Home />;
     }
 
