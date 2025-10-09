@@ -115,133 +115,216 @@ function escapeHtml(text) {
 }
 
 function formatBotResponse(text, userQuestion) {
-  const responseTitle = generateResponseTitle(userQuestion);
-  
+  const responseTitle = typeof generateResponseTitle === 'function'
+    ? generateResponseTitle(userQuestion)
+    : (userQuestion || 'Response');
+
+  // wrapper start
   let formattedText = `
     <div class="response-container">
       <div class="response-header">
         <div class="response-title-container">
-          <h4 class="response-title">${responseTitle}</h4>
+          <h4 class="response-title">${escapeHtml(responseTitle)}</h4>
           <div class="response-divider"></div>
         </div>
       </div>
       <div class="response-content">
   `;
 
-  // Handle code blocks first
+  text = (text || '').replace(/\r\n/g, '\n');
+
+  // --- handle code blocks first (placeholders) ---
   const codeBlocks = [];
   let codeBlockIndex = 0;
-  
   text = text.replace(/```(\w+)?\n?([\s\S]*?)```/g, (match, language, code) => {
-    const detectedLang = language || detectLanguage(code);
-    const langDisplay = detectedLang.charAt(0).toUpperCase() + detectedLang.slice(1);
-    const escapedCode = escapeHtml(code).replace(/'/g, "\\'");
-
+    const detectedLang = language || (typeof detectLanguage === 'function' ? detectLanguage(code) : 'text');
+    const langDisplay = (detectedLang || 'text').charAt(0).toUpperCase() + (detectedLang || 'text').slice(1);
+    const escapedCode = (typeof escapeHtml === 'function' ? escapeHtml(code) : escapeHtmlFallback(code)).replace(/'/g, "\\'");
     const placeholder = `__CODE_BLOCK_${codeBlockIndex}__`;
-    codeBlocks[codeBlockIndex] = `
+    codeBlocks.push(`
       <div class="code-block-wrapper">
         <div class="code-block">
           <div class="code-header">
-            <span class="code-language">${langDisplay}</span>
-            <button class="copy-btn" data-copy-text="${escapedCode.substring(0, 50)}" onclick="window.copyToClipboard('${escapedCode}')">
+            <span class="code-language">${escapeHtml(langDisplay)}</span>
+            <button class="copy-btn" data-copy-text="${escapedCode.substring(0, 200)}" onclick="window.copyToClipboard('${escapedCode}')">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
-          <div class="code-content">
-            <pre><code class="language-${detectedLang}">${escapeHtml(code)}</code></pre>
-          </div>
+          <div class="code-content"><pre><code class="language-${escapeHtml(detectedLang)}">${escapeHtml(code)}</code></pre></div>
         </div>
-      </div>`;
-    
+      </div>
+    `);
     codeBlockIndex++;
     return placeholder;
   });
 
-  // Clean the text and split into paragraphs
-  const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
-  
+  // helper escape if escapeHtml not defined
+  function escapeHtmlFallback(s) {
+    return String(s).replace(/[&<>"']/g, function (m) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
+    });
+  }
+  const _escape = typeof escapeHtml === 'function' ? escapeHtml : escapeHtmlFallback;
+  const _formatInline = typeof formatInlineText === 'function' ? formatInlineText : (s => _escape(s));
+
+  // --- list stack and helpers ---
+  const lines = text.split('\n');
   let processedText = '';
-  
-  paragraphs.forEach((paragraph, index) => {
-    let processedParagraph = paragraph.trim();
-    
-    // Handle headers (# and ##)
-    if (/^#{1,2}\s/.test(processedParagraph)) {
-      if (processedParagraph.startsWith('## ')) {
-        processedParagraph = processedParagraph.replace(/^##\s/, '');
-        processedParagraph = `<h4 class="response-h4">${processedParagraph}</h4>`;
-      } else if (processedParagraph.startsWith('# ')) {
-        processedParagraph = processedParagraph.replace(/^#\s/, '');
-        processedParagraph = `<h3 class="response-h3">${processedParagraph}</h3>`;
+  const openListStack = []; // each: { tag: 'ol'|'ul', type: 'numbered'|'bulleted' }
+
+  function closeOneList() {
+    if (openListStack.length === 0) return;
+    const item = openListStack.pop();
+    processedText += `</${item.tag}>`;
+  }
+  function closeToDepth(depth) {
+    while (openListStack.length > depth) closeOneList();
+  }
+  function closeAllLists() {
+    closeToDepth(0);
+  }
+  function ensureList(type, level) {
+    // close deeper lists
+    while (openListStack.length > level - 1) closeOneList();
+    // open until reach level
+    while (openListStack.length < level) {
+      const tag = type === 'numbered' ? 'ol' : 'ul';
+      processedText += `<${tag} class="${type}-list level-${openListStack.length + 1}">`;
+      openListStack.push({ tag, type });
+    }
+    // if top type differs, replace it
+    const top = openListStack[openListStack.length - 1];
+    if (top && top.type !== type) {
+      const popped = openListStack.pop();
+      processedText += `</${popped.tag}>`;
+      const tag = type === 'numbered' ? 'ol' : 'ul';
+      processedText += `<${tag} class="${type}-list level-${openListStack.length + 1}">`;
+      openListStack.push({ tag, type });
+    }
+  }
+
+  // --- special state for auto-nesting simple numbered lists under the last top-level number ---
+  let currentParentNumber = null;  // e.g. "2" when we saw "2. Steps:"
+  let nestedCounter = 0;           // increments for 2.1, 2.2...
+  let lastWasTopLevelNumber = false;
+  let lastLineWasBlank = true;
+
+  lines.forEach(rawLine => {
+    // Preserve indentation for detecting bullets
+    if (/^\s*$/.test(rawLine)) {
+      // blank line -> break auto-nesting context but don't forcibly close open lists
+      lastWasTopLevelNumber = false;
+      currentParentNumber = null;
+      nestedCounter = 0;
+      lastLineWasBlank = true;
+      return;
+    }
+    lastLineWasBlank = false;
+
+    // Headings: markdown-style (#, ##)
+    const headingMatch = rawLine.trim().match(/^(#{1,6})\s+(.*)$/);
+    if (headingMatch) {
+      closeAllLists();
+      const level = headingMatch[1].length;
+      const content = _formatInline(headingMatch[2]);
+      const hTag = level <= 2 ? 'h4' : (level === 3 ? 'h5' : 'h6');
+      processedText += `<${hTag} class="response-subtitle">${content}</${hTag}>`;
+      // reset auto-nesting
+      currentParentNumber = null;
+      nestedCounter = 0;
+      lastWasTopLevelNumber = false;
+      return;
+    }
+
+    // Blockquote
+    const blockquoteMatch = rawLine.match(/^\s*>\s+(.*)$/);
+    if (blockquoteMatch) {
+      closeAllLists();
+      processedText += `<blockquote class="response-quote">${_formatInline(blockquoteMatch[1])}</blockquote>`;
+      currentParentNumber = null;
+      nestedCounter = 0;
+      lastWasTopLevelNumber = false;
+      return;
+    }
+
+    // Explicit nested numbering like "1.1" or "2.3.1"
+    const explicitNestedMatch = rawLine.trim().match(/^((?:\d+\.)+\d+)\s*[.)]?\s*(.*)$/);
+    if (explicitNestedMatch) {
+      const rawNumber = explicitNestedMatch[1].replace(/\.$/, '');
+      const content = explicitNestedMatch[2] || '';
+      const level = rawNumber.split('.').length;
+      ensureList('numbered', level);
+      processedText += `<li class="nested-item level-${level}"><span class="nested-number">${_escape(rawNumber)}</span> ${_formatInline(content)}</li>`;
+      // explicit nested resets auto-parenting
+      currentParentNumber = null;
+      nestedCounter = 0;
+      lastWasTopLevelNumber = false;
+      return;
+    }
+
+    // Simple numbering (e.g., "1. Title")
+    const simpleNumMatch = rawLine.match(/^\s*(\d+)\.\s*(.*)$/);
+    if (simpleNumMatch) {
+      const number = simpleNumMatch[1];
+      const content = simpleNumMatch[2] || '';
+
+      if (lastWasTopLevelNumber && currentParentNumber !== null) {
+        // auto-nest under currentParentNumber => produce parentNumber.N sequentially
+        nestedCounter++;
+        ensureList('numbered', 2);
+        processedText += `<li class="nested-item level-2"><span class="nested-number">${_escape(currentParentNumber + '.' + nestedCounter)}</span> ${_formatInline(content)}</li>`;
+        // remain in auto-nesting mode (allow subsequent simple numbers to also nest)
+        lastWasTopLevelNumber = true;
+        return;
+      } else {
+        // treat as top-level numbered item
+        ensureList('numbered', 1);
+        processedText += `<li class="step-item level-1"><span class="step-number">${_escape(number)}.</span> ${_formatInline(content)}</li>`;
+        // set this as possible parent for following simple-numbered lines
+        currentParentNumber = number;
+        nestedCounter = 0;
+        lastWasTopLevelNumber = true;
+        return;
       }
-      processedText += processedParagraph;
+    }
+
+    // Bullets (detect indentation via leading spaces)
+    const bulletMatch = rawLine.match(/^(\s*)[-*]\s+(.*)$/);
+    if (bulletMatch) {
+      const leadingSpaces = (bulletMatch[1] || '').length;
+      const content = bulletMatch[2];
+      // if there's an active top-level parent number and lastWasTopLevelNumber true -> put bullets at level-2
+      let level = 2;
+      if (leadingSpaces >= 2) level = 3;
+      ensureList('bulleted', level);
+      processedText += `<li class="bullet-item level-${level}">${_formatInline(content)}</li>`;
+      // bullets under a parent keep parent open (so further simple numbers become nested)
       return;
     }
-    
-    // Handle numbered lists (step-by-step)
-    if (/^\d+\.\s/.test(processedParagraph)) {
-      const lines = processedParagraph.split('\n');
-      let listItems = '';
-      let currentItem = '';
-      
-      lines.forEach(line => {
-        if (/^\d+\.\s/.test(line)) {
-          if (currentItem) {
-            listItems += `<li class="step-item">${formatInlineText(currentItem.trim())}</li>`;
-          }
-          currentItem = line.replace(/^\d+\.\s/, '');
-        } else if (line.trim()) {
-          currentItem += (currentItem ? ' ' : '') + line.trim();
-        }
-      });
-      
-      if (currentItem) {
-        listItems += `<li class="step-item">${formatInlineText(currentItem.trim())}</li>`;
-      }
-      
-      processedText += `<ol class="step-list">${listItems}</ol>`;
-      return;
-    }
-    
-    // Handle bullet lists
-    if (/^[-*]\s/.test(processedParagraph)) {
-      const lines = processedParagraph.split('\n');
-      let listItems = '';
-      
-      lines.forEach(line => {
-        if (/^[-*]\s/.test(line)) {
-          const itemText = line.replace(/^[-*]\s/, '');
-          listItems += `<li class="bullet-item">${formatInlineText(itemText)}</li>`;
-        }
-      });
-      
-      processedText += `<ul class="bullet-list">${listItems}</ul>`;
-      return;
-    }
-    
-    // Handle blockquotes
-    if (/^>\s/.test(processedParagraph)) {
-      processedParagraph = processedParagraph.replace(/^>\s/, '');
-      processedText += `<blockquote class="response-quote">${formatInlineText(processedParagraph)}</blockquote>`;
-      return;
-    }
-    
-    // Regular paragraphs
-    processedText += `<p class="response-paragraph">${formatInlineText(processedParagraph)}</p>`;
+
+    // Normal paragraph -> close lists and render paragraph
+    closeAllLists();
+    processedText += `<p class="response-paragraph">${_formatInline(rawLine.trim())}</p>`;
+    // reset auto-nesting
+    currentParentNumber = null;
+    nestedCounter = 0;
+    lastWasTopLevelNumber = false;
   });
 
-  // Apply highlighting to important terms
-  processedText = highlightImportantTerms(processedText);
+  closeAllLists();
+
+  processedText = (typeof highlightImportantTerms === 'function') ? highlightImportantTerms(processedText) : processedText;
 
   formattedText += processedText + '</div></div>';
 
-  // Replace code block placeholders
-  codeBlocks.forEach((codeBlock, index) => {
-    formattedText = formattedText.replace(`__CODE_BLOCK_${index}__`, codeBlock);
+  // Replace code block placeholders back
+  codeBlocks.forEach((cb, idx) => {
+    formattedText = formattedText.replace(`__CODE_BLOCK_${idx}__`, cb);
   });
 
   return formattedText;
 }
+
 
 // Helper function to format inline text (bold, italic)
 function formatInlineText(text) {
@@ -343,10 +426,11 @@ function Home({ onLogout }) {
 
   // Make copyToClipboard available globally for the onclick handlers
   useEffect(() => {
+    // Make copyToClipboard available globally for the onclick handler
     window.copyToClipboard = copyToClipboard;
     
     return () => {
-      // Cleanup on unmount
+      // Cleanup
       delete window.copyToClipboard;
     };
   }, []);
