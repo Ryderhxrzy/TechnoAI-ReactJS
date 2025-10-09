@@ -750,7 +750,7 @@ function Home({ onLogout }) {
         text: aiResponse,
         sender: "bot",
         timestamp: new Date(),
-        formattedText: formatBotResponse(aiResponse, currentMessage) // Add formatted text
+        formattedText: formatBotResponse(aiResponse, currentMessage)
       };
 
       setChatMessages((prev) => [...prev, botMessage]);
@@ -1021,7 +1021,6 @@ function Home({ onLogout }) {
                     <span></span>
                     <span></span>
                   </div>
-                  <span className="typing-text">Techno.ai is thinking...</span>
                 </div>
               )}
             </div>
