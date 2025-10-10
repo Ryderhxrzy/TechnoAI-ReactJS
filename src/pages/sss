@@ -60,19 +60,32 @@ function copyToClipboard(text) {
   });
 }
 
-// Generate a short descriptive title for the user's query
-function generateShortTitle(userQuestion) {
-  if (!userQuestion) return "AI Response";
-
-  // Clean question
-  let q = userQuestion.trim();
-  q = q.replace(/\?+$/, ""); // remove trailing question marks
-  q = q.replace(/\b(how to|how do i|how can i|paano|create|make|build|do|show|write|explain)\b/gi, "").trim();
-
-  // Capitalize main keywords
-  const words = q.split(" ").filter(w => w.length > 2).slice(0, 6);
-  const capitalized = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
-  return capitalized.join(" ") || "AI Response";
+function generateResponseTitle(userQuestion) {
+  if (userQuestion.length > 50) {
+    userQuestion = userQuestion.substring(0, 50) + '...';
+  }
+  
+  const patterns = {
+    code: /(gumawa ng code|paano gawin ang|how to code|write a code|create a|function|class)/i,
+    explain: /(ano ang|what is|explain|ipaliwanag|meaning of|define)/i,
+    compare: /(difference between|vs\.?|compare|pagkakaiba)/i,
+    tutorial: /(paano|how to|steps|tutorial|guide|gabay)/i,
+    error: /(error|fix|problem|issue|not working|ayaw gumana)/i
+  };
+  
+  if (patterns.code.test(userQuestion)) {
+    return "Step-by-Step Code Solution";
+  } else if (patterns.explain.test(userQuestion)) {
+    return "Step-by-Step Explanation";
+  } else if (patterns.compare.test(userQuestion)) {
+    return "Step-by-Step Comparison";
+  } else if (patterns.tutorial.test(userQuestion)) {
+    return "Step-by-Step Guide";
+  } else if (patterns.error.test(userQuestion)) {
+    return "Step-by-Step Solution";
+  }
+  
+  return "Step-by-Step Response";
 }
 
 function highlightImportantTerms(text) {
@@ -102,13 +115,16 @@ function escapeHtml(text) {
 }
 
 function formatBotResponse(text, userQuestion) {
-  const shortTitle = generateShortTitle(userQuestion);
+  const responseTitle = typeof generateResponseTitle === 'function'
+    ? generateResponseTitle(userQuestion)
+    : (userQuestion || 'Response');
 
+  // wrapper start
   let formattedText = `
     <div class="response-container">
       <div class="response-header">
         <div class="response-title-container">
-          <h4 class="response-title">${shortTitle}</h4>
+          <h4 class="response-title">${escapeHtml(responseTitle)}</h4>
           <div class="response-divider"></div>
         </div>
       </div>
@@ -309,6 +325,7 @@ function formatBotResponse(text, userQuestion) {
   return formattedText;
 }
 
+
 // Helper function to format inline text (bold, italic)
 function formatInlineText(text) {
   return text
@@ -337,93 +354,29 @@ function isGreeting(message) {
   return greetingPatterns.some(pattern => pattern.test(message.trim()));
 }
 
-function enhancePromptForSteps(userMessage, userName = "", options = {}) {
-  const roleName = options.roleName || "Techno.ai";
-  const preferTagalog = !!options.preferTagalog;
-  const audience = options.audience || "student";
-
-  if (!userMessage || typeof userMessage !== "string") {
-    return `User Question: ""
-Please enter your question so I can create a student-friendly step-by-step plan.`;
-  }
-
-  const usedTagalog =
-    preferTagalog ||
-    /\b(kumusta|kamusta|maganda|salamat|ano|paki|sana|ayusin|ayos|gawin|po|opo|tulungan)\b/i.test(userMessage);
-
+// Function to enhance user prompt for step-by-step responses
+function enhancePromptForSteps(userMessage, userName) {
+  // Check if it's a greeting
   if (isGreeting(userMessage)) {
-    const greet = usedTagalog
-      ? `Hi! I'm ${roleName}${userName ? ` — ${userName}` : ""}. Kumusta? Paano kita matutulungan ngayon?`
-      : `Hi! I'm ${roleName}${userName ? ` — ${userName}` : ""}. How can I help you today?`;
-
-    return `
-${greet}
-
-Respond briefly, then guide the student through a short step-by-step plan *before coding*:
-
-**Planning Checklist:**
-1. Goal — “Ano ang expected output?”
-2. Constraints — memory, time, allowed tools.
-3. Prior Knowledge — e.g., HTML, JS, Python.
-4. Plan — 3–6 short steps.
-5. Pre-coding — tests or files needed.
-
-After planning, proceed with the Technical Answer Layout.
-`.trim();
+    return `Respond to this greeting: "${userMessage}". Always start your response by introducing yourself as "Hi! I'm Techno.ai" and include the user's name "${userName}" in a friendly way. Keep it conversational and ask how you can help them today.`;
   }
 
-  const langNote = usedTagalog ? "Tagalog" : "English";
+  // For technical questions, modify the prompt to request step-by-step solutions
+  const stepByStepInstruction = `
+Please provide a comprehensive step-by-step solution for: "${userMessage}"
 
-  return `
-User Question: "${userMessage}"
+Structure your response as follows:
+1. Start with a brief overview of what we're going to solve
+2. Break down the solution into clear, numbered steps
+3. Explain each step thoroughly with reasoning
+4. Provide the final answer or complete solution at the end
+5. If it involves code, show the step-by-step development process first, then provide the complete final code
 
-**Audience:** ${audience}
-**Language:** ${langNote}
-**Role:** ${roleName}
+Make sure to explain the "why" behind each step, not just the "how". This helps the user understand the problem-solving process.
+`;
 
-You are an AI teaching assistant for BSIT students at Bestlink College. Provide clear, practical, and educational IT-focused solutions.
-
-**OUTPUT FORMAT:**
-# <Short descriptive title>
-
-## Learning Objectives
-2–3 concise BSIT-related goals.
-
-## Summary
-1–2 lines overview of the solution.
-
-## Prerequisites
-Key skills or IT concepts needed.
-
-## Step-by-Step Guide
-1. Sequential steps.
-   - **Why:** purpose or concept
-   - **How:** short explanation/code
-   - **Verify:** how to confirm success
-
-## Final Code
-Complete, runnable example.
-
-## Test Cases
-Sample inputs and outputs.
-
-## Common Errors
-Frequent mistakes and quick fixes.
-
-## Resources
-Useful references or documentation.
-
-Keep responses concise (under 5000 tokens), educational, and focused on real-world IT applications.
-
-Now answer: "${userMessage}"
-`.trim();
+  return stepByStepInstruction;
 }
-
-if (typeof window !== "undefined") {
-  window.isGreeting = isGreeting;
-  window.enhancePromptForSteps = enhancePromptForSteps;
-}
-
 
 function Home({ onLogout }) {
   // Get dynamic user data from localStorage
@@ -461,12 +414,6 @@ function Home({ onLogout }) {
   const [isTyping, setIsTyping] = useState(false);
   const [apiStatus, setApiStatus] = useState("checking");
 
-  // Voice recording states
-  const [isRecording, setIsRecording] = useState(false);
-  const [recognition, setRecognition] = useState(null);
-  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
-  const [interimTranscript, setInterimTranscript] = useState("");
-
   // Refs
   const userProfileRef = useRef(null);
   const chatBoxRef = useRef(null);
@@ -486,91 +433,6 @@ function Home({ onLogout }) {
       // Cleanup
       delete window.copyToClipboard;
     };
-  }, []);
-
-  // Initialize speech recognition
-  useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
-    if (SpeechRecognition) {
-      setIsSpeechSupported(true);
-      const recognitionInstance = new SpeechRecognition();
-      recognitionInstance.continuous = true;
-      recognitionInstance.interimResults = true;
-      recognitionInstance.lang = 'en-US';
-      recognitionInstance.maxAlternatives = 1;
-
-      recognitionInstance.onstart = () => {
-        console.log('Speech recognition started');
-        setIsRecording(true);
-        setInterimTranscript("");
-      };
-
-      recognitionInstance.onresult = (event) => {
-        console.log('Speech recognition result received');
-        let finalTranscript = '';
-        let interim = '';
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-          } else {
-            interim += transcript;
-          }
-        }
-
-        console.log('Final transcript:', finalTranscript);
-        console.log('Interim transcript:', interim);
-
-        if (finalTranscript) {
-          setMessage(prev => {
-            const newMessage = prev + finalTranscript + " ";
-            console.log('Setting final message:', newMessage);
-            return newMessage;
-          });
-          setInterimTranscript("");
-        } else if (interim) {
-          setInterimTranscript(interim);
-        }
-      };
-
-      recognitionInstance.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        setIsRecording(false);
-        setInterimTranscript("");
-        
-        if (event.error === 'not-allowed') {
-          Swal.fire({
-            title: 'Microphone Access Denied',
-            text: 'Please allow microphone access to use voice input. Click the microphone icon and allow permission when prompted.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        } else if (event.error === 'no-speech') {
-          console.log('No speech detected - this is normal when starting');
-          // Don't show error for no-speech, it's common when starting
-        } else {
-          Swal.fire({
-            title: 'Voice Input Error',
-            text: `Error: ${event.error}. Please try again.`,
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        }
-      };
-
-      recognitionInstance.onend = () => {
-        console.log('Speech recognition ended');
-        setIsRecording(false);
-        setInterimTranscript("");
-      };
-
-      setRecognition(recognitionInstance);
-    } else {
-      setIsSpeechSupported(false);
-      console.warn('Speech recognition not supported in this browser');
-    }
   }, []);
 
   // Check API key on component mount
@@ -631,7 +493,7 @@ function Home({ onLogout }) {
         }
       ],
       generationConfig: {
-        maxOutputTokens: 5000, // Increased for more detailed step-by-step responses
+        maxOutputTokens: 2000, // Increased for more detailed step-by-step responses
         temperature: 0.7,
       }
     };
@@ -701,7 +563,7 @@ function Home({ onLogout }) {
             }
           ],
           generationConfig: {
-            maxOutputTokens: 5000,
+            maxOutputTokens: 2000,
             temperature: 0.7,
           }
         };
@@ -853,78 +715,6 @@ function Home({ onLogout }) {
   const handleSettings = () => {
     setShowLogoutDropdown(false);
     console.log("Settings clicked");
-  };
-
-  // Voice recording functions
-  const startRecording = async () => {
-    if (recognition && isSpeechSupported) {
-      try {
-        // Request microphone permission first
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          // Stop the stream immediately since we just needed permission
-          stream.getTracks().forEach(track => track.stop());
-        } catch (err) {
-          console.error('Microphone permission denied:', err);
-          Swal.fire({
-            title: 'Microphone Access Required',
-            text: 'Please allow microphone access to use voice input.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-          return;
-        }
-
-        // Start recognition
-        recognition.start();
-        console.log('Starting speech recognition...');
-        
-        // Show recording started message
-        Swal.fire({
-          title: 'Recording Started',
-          text: 'Speak now... Click stop when finished.',
-          icon: 'info',
-          timer: 2000,
-          showConfirmButton: false
-        });
-      } catch (error) {
-        console.error('Error starting speech recognition:', error);
-        Swal.fire({
-          title: 'Recording Error',
-          text: 'Unable to start voice recording. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
-    } else {
-      Swal.fire({
-        title: 'Voice Input Not Supported',
-        text: 'Your browser does not support speech recognition. Please use Chrome or Edge.',
-        icon: 'warning',
-        confirmButtonText: 'OK'
-      });
-    }
-  };
-
-  const stopRecording = () => {
-    if (recognition && isRecording) {
-      recognition.stop();
-      console.log('Stopping speech recognition...');
-      
-      // Add interim transcript to final message if any
-      if (interimTranscript) {
-        setMessage(prev => prev + interimTranscript + " ");
-        setInterimTranscript("");
-      }
-    }
-  };
-
-  const toggleRecording = () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
   };
 
   // Decide which chevron to show
@@ -1197,12 +987,6 @@ function Home({ onLogout }) {
                   ? "I'm here to help you with step-by-step solutions, coding guidance, and detailed explanations. Ask me anything and I'll break it down for you!"
                   : "Please configure your Gemini API key to start chatting."}
               </p>
-              {isSpeechSupported && (
-                <div className="voice-feature-info">
-                  <i className="fas fa-microphone"></i>
-                  <span>Try voice input by clicking the microphone button!</span>
-                </div>
-              )}
             </div>
           ) : (
             <div className="messages-container">
@@ -1248,14 +1032,10 @@ function Home({ onLogout }) {
           <div className="input-wrapper" id="chat-input-wrapper">
             <textarea
               id="user-input"
-              placeholder={
-                apiStatus === "available" 
-                  ? (isRecording ? "Speak now..." : "Ask Techno.ai for step-by-step solutions...") 
-                  : "Configure API key to chat"
-              }
+              placeholder={apiStatus === "available" ? "Ask Techno.ai for step-by-step solutions..." : "Configure API key to chat"}
               rows="1"
               aria-label="Message"
-              value={isRecording && interimTranscript ? message + interimTranscript : message}
+              value={message}
               onChange={(e) => {
                 setMessage(e.target.value);
                 autoResize(e);
@@ -1274,24 +1054,15 @@ function Home({ onLogout }) {
               disabled={isTyping || apiStatus !== "available"}
             />
 
-            {isRecording && interimTranscript && (
-              <div className="interim-transcript">
-                <i className="fas fa-waveform-lines"></i>
-                {interimTranscript}
-              </div>
-            )}
-
             <div className="button-group">
               <button
                 type="button"
-                className={`icon-btn ${isRecording ? 'recording' : ''}`}
+                className="icon-btn"
                 id="mic-btn"
                 aria-label="Voice input"
-                onClick={toggleRecording}
-                disabled={isTyping || apiStatus !== "available" || !isSpeechSupported}
-                title={isSpeechSupported ? (isRecording ? "Stop recording" : "Start voice input") : "Voice input not supported"}
+                disabled={isTyping || apiStatus !== "available"}
               >
-                <i className={`fas ${isRecording ? 'fa-stop' : 'fa-microphone'}`}></i>
+                <i className="fas fa-microphone"></i>
               </button>
 
               <button
