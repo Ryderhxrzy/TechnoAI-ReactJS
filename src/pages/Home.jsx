@@ -461,6 +461,9 @@ function Home({ onLogout }) {
   const [isTyping, setIsTyping] = useState(false);
   const [apiStatus, setApiStatus] = useState("checking");
 
+  // Base URL for backend API
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
   // Chat conversation states
   const [conversationTitles, setConversationTitles] = useState([]);
   const [currentChatTitle, setCurrentChatTitle] = useState("Welcome Chat");
@@ -591,16 +594,16 @@ function Home({ onLogout }) {
   const testBackendConnection = async () => {
     try {
       console.log('Testing backend connection...');
-      const response = await fetch('http://localhost:5000/');
+      const response = await fetch(`${API_BASE_URL}/api/health`);
       if (response.ok) {
-        const data = await response.text();
+        const data = await response.json();
         console.log('Backend is running:', data);
       } else {
         console.error('Backend responded with error:', response.status);
       }
     } catch (error) {
       console.error('Backend connection failed:', error);
-      console.error('Please make sure the backend server is running on port 5000');
+      console.error('Please make sure the backend server is running and reachable.');
     }
   };
 
@@ -643,7 +646,7 @@ function Home({ onLogout }) {
     setLoadingConversations(true);
     try {
       console.log('Loading conversation titles for user:', userId);
-      const response = await fetch(`http://localhost:5000/api/messages/titles/${encodeURIComponent(userId)}`);
+      const response = await fetch(`${API_BASE_URL}/api/messages/titles/${encodeURIComponent(userId)}`);
       if (response.ok) {
         const titles = await response.json();
         console.log('Loaded conversation titles:', titles);
@@ -667,9 +670,9 @@ function Home({ onLogout }) {
     
     try {
       console.log('Saving messages to database:', messages);
-      console.log('Backend URL: http://localhost:5000/api/messages/batch');
+      console.log('Backend URL:', `${API_BASE_URL}/api/messages/batch`);
       
-      const response = await fetch('http://localhost:5000/api/messages/batch', {
+      const response = await fetch(`${API_BASE_URL}/api/messages/batch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -700,7 +703,7 @@ function Home({ onLogout }) {
     if (!userId) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/messages/chat/${encodeURIComponent(userId)}/${encodeURIComponent(title)}`);
+      const response = await fetch(`${API_BASE_URL}/api/messages/chat/${encodeURIComponent(userId)}/${encodeURIComponent(title)}`);
       if (response.ok) {
         const messages = await response.json();
         console.log('Raw messages from database:', messages);
@@ -761,10 +764,9 @@ function Home({ onLogout }) {
 
   const checkApiKey = async () => {
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
       
       // Test backend connection and API key configuration
-      const response = await fetch(`${API_BASE_URL}/api/ai/health`, {
+      const response = await fetch(`${API_BASE_URL}/api/health`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -802,7 +804,6 @@ function Home({ onLogout }) {
   // Send message to Gemini API
   const sendToGemini = async (userMessage) => {
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
       
       console.log('Sending message to backend:', userMessage);
       
@@ -1333,7 +1334,7 @@ function Home({ onLogout }) {
           if (newTitle && newTitle !== currentTitle && newTitle.length <= 50) {
             try {
               // Update in database
-              const response = await fetch(`http://localhost:5000/api/messages/update-title/${encodeURIComponent(userId)}/${encodeURIComponent(currentTitle)}`, {
+              const response = await fetch(`${API_BASE_URL}/api/messages/update-title/${encodeURIComponent(userId)}/${encodeURIComponent(currentTitle)}`, {
                 method: 'PUT',
                 headers: {
                   'Content-Type': 'application/json',
@@ -1424,7 +1425,7 @@ function Home({ onLogout }) {
       if (result.isConfirmed) {
         try {
           // Delete conversation from database
-          const response = await fetch(`http://localhost:5000/api/messages/delete-conversation/${encodeURIComponent(userId)}/${encodeURIComponent(title)}`, {
+          const response = await fetch(`${API_BASE_URL}/api/messages/delete-conversation/${encodeURIComponent(userId)}/${encodeURIComponent(title)}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
