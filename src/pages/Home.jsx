@@ -337,7 +337,7 @@ function isGreeting(message) {
   return greetingPatterns.some(pattern => pattern.test(message.trim()));
 }
 
-/*function enhancePromptForSteps(userMessage, userName = "", options = {}) {
+function enhancePromptForSteps(userMessage, userName = "", options = {}) {
   const roleName = options.roleName || "Techno.ai";
   const preferTagalog = !!options.preferTagalog;
   const audience = options.audience || "student";
@@ -422,7 +422,7 @@ Now answer: "${userMessage}"
 if (typeof window !== "undefined") {
   window.isGreeting = isGreeting;
   window.enhancePromptForSteps = enhancePromptForSteps;
-}*/
+}
 
 
 function Home({ onLogout }) {
