@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
 import TermsOfService from '../components/TermsOfService';
 import PrivacyPolicy from '../components/PrivacyPolicy';
+import { registerUser } from "../api.js";
 
 function Register(props) {
     const [theme, setTheme] = useState(() => {

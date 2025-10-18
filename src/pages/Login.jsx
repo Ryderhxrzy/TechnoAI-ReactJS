@@ -8,7 +8,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import Home from './Home';
 import Swal from 'sweetalert2';
-import { loginUser, googleLogin } from "../api.js"; // ✅ use API functions
+import { loginUser, googleLogin } from "../api.js";
 
 function Login(props) {
     const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
