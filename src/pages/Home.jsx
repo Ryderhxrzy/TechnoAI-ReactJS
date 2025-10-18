@@ -460,7 +460,7 @@ function Home({ onLogout }) {
   const [showLogoutDropdown, setShowLogoutDropdown] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [apiStatus, setApiStatus] = useState("checking");
-  
+
   // Chat conversation states
   const [conversationTitles, setConversationTitles] = useState([]);
   const [currentChatTitle, setCurrentChatTitle] = useState("Welcome Chat");
@@ -1335,11 +1335,11 @@ function Home({ onLogout }) {
                 </div>
               ))}
               {conversationTitles.length === 0 && !loadingConversations && (
-                <div className="chat-item active" data-chat-id="1">
-                  <div className="chat-title">Welcome Chat</div>
-                  <div className="chat-preview">How can I help you today?</div>
-                  <div className="chat-time">Just now</div>
-                </div>
+          <div className="chat-item active" data-chat-id="1">
+            <div className="chat-title">Welcome Chat</div>
+            <div className="chat-preview">How can I help you today?</div>
+            <div className="chat-time">Just now</div>
+          </div>
               )}
             </>
           )}
@@ -1468,27 +1468,27 @@ function Home({ onLogout }) {
                   formattedTextLength: msg.formattedText ? msg.formattedText.length : 0
                 });
                 return (
-                  <div 
-                    key={msg.id} 
-                    className={`message ${msg.sender}-message ${msg.isError ? 'error-message' : ''}`}
-                  >
-                    {msg.sender === "bot" && msg.formattedText ? (
-                      <div 
-                        dangerouslySetInnerHTML={{ __html: msg.formattedText }}
-                        onClick={(e) => {
-                          // Handle copy button clicks within the formatted text
-                          if (e.target.classList.contains('copy-btn')) {
-                            const copyText = e.target.getAttribute('data-copy-text');
-                            if (copyText) {
-                              handleCopyClick(copyText);
-                            }
+                <div 
+                  key={msg.id} 
+                  className={`message ${msg.sender}-message ${msg.isError ? 'error-message' : ''}`}
+                >
+                  {msg.sender === "bot" && msg.formattedText ? (
+                    <div 
+                      dangerouslySetInnerHTML={{ __html: msg.formattedText }}
+                      onClick={(e) => {
+                        // Handle copy button clicks within the formatted text
+                        if (e.target.classList.contains('copy-btn')) {
+                          const copyText = e.target.getAttribute('data-copy-text');
+                          if (copyText) {
+                            handleCopyClick(copyText);
                           }
-                        }}
-                      />
-                    ) : (
+                        }
+                      }}
+                    />
+                  ) : (
                       <div>{msg.text || 'No content'}</div>
-                    )}
-                  </div>
+                  )}
+                </div>
                 );
               })}
               

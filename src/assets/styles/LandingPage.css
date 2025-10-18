@@ -22,7 +22,7 @@ body.landing-page {
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
@@ -47,7 +47,7 @@ body.landing-page {
 }
 
 .nav-logo-text {
-    background: linear-gradient(135deg, var(--accent-primary), #10b981);
+    background: var(--gradient-main);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -114,6 +114,8 @@ body.landing-page {
 
 /* Hero Section */
 .hero-section {
+    width: 100%;
+    min-width: 100vw;
     padding: 120px 0 80px;
     position: relative;
     overflow: hidden;
@@ -168,7 +170,7 @@ body.landing-page {
 }
 
 .hero-highlight {
-    background: linear-gradient(135deg, var(--accent-primary), #10b981);
+    background: var(--gradient-main);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -287,7 +289,7 @@ body.landing-page {
     width: 300px;
     height: 300px;
     object-fit: contain;
-    filter: drop-shadow(0 20px 60px rgba(16, 163, 127, 0.3));
+    filter: drop-shadow(0 20px 60px var(--accent-hover1));
     animation: float 3s ease-in-out infinite;
     transition: transform 0.3s ease;
 }
@@ -303,6 +305,8 @@ body.landing-page {
 
 /* Features Section */
 .features-section {
+    width: 100%;
+    min-width: 100vw;
     padding: 100px 0;
     background: var(--bg-primary);
 }
@@ -357,7 +361,7 @@ body.landing-page {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(135deg, var(--accent-primary), #10b981);
+    background: var(--gradient-main);
     transform: scaleX(0);
     transition: transform 0.3s ease;
 }
@@ -375,7 +379,7 @@ body.landing-page {
 .feature-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, var(--accent-primary), #10b981);
+    background: var(--gradient-main);
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -383,7 +387,7 @@ body.landing-page {
     margin: 0 auto 24px;
     font-size: 2rem;
     color: white;
-    box-shadow: 0 8px 30px rgba(16, 163, 127, 0.3);
+    box-shadow: 0 20px 60px var(--accent-hover1);
 }
 
 .feature-title {
@@ -401,6 +405,8 @@ body.landing-page {
 
 /* About Section */
 .about-section {
+    width: 100%;
+    min-width: 100vw;
     padding: 100px 0;
     background: var(--bg-secondary);
 }
@@ -466,14 +472,14 @@ body.landing-page {
 .student-avatar {
     width: 150px;
     height: 150px;
-    background: linear-gradient(135deg, var(--accent-primary), #10b981);
+    background: var(--gradient-main);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 3rem;
     color: white;
-    box-shadow: 0 20px 60px rgba(16, 163, 127, 0.3);
+    box-shadow: 0 20px 60px var(--accent-hover1);
     animation: pulse 2s ease-in-out infinite;
 }
 
@@ -529,9 +535,11 @@ body.landing-page {
 
 /* CTA Section */
 .cta-section {
+    width: 100%;
+    min-width: 100vw;
     padding: 100px 0;
-    background: linear-gradient(135deg, var(--accent-primary), #10b981);
-    color: white;
+    background: var(--gradient-main);
+    color: var(--text-primary1);
     text-align: center;
 }
 
@@ -625,7 +633,7 @@ body.landing-page {
 .footer-logo-text {
     font-size: 1.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--accent-primary), #10b981);
+    background: var(--gradient-main);   
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -672,6 +680,36 @@ body.landing-page {
 }
 
 .footer-copyright {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.footer-legal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.footer-legal-link {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.footer-legal-link:hover {
+    color: var(--accent-primary);
+    background: var(--bg-hover);
+}
+
+.footer-separator {
     color: var(--text-muted);
     font-size: 0.9rem;
 }

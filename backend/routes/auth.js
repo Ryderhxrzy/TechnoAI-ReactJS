@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema({
     enum: ['email', 'google'],
     required: true
   },
+  agreed_to_terms: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
   created_at: {
     type: Date,
     default: Date.now
@@ -51,13 +56,21 @@ router.get('/test', (req, res) => {
 // Google login/register endpoint
 router.post('/google', async (req, res) => {
   try {
-    const { full_name, email, profile, method } = req.body;
+    const { full_name, email, profile, method, agreed_to_terms } = req.body;
 
     // Validate required fields
     if (!full_name || !email || !method) {
       return res.status(400).json({ 
         success: false, 
         message: 'Full name, email, and method are required' 
+      });
+    }
+
+    // Validate method
+    if (method !== 'google') {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid method. Use "google" for Google authentication' 
       });
     }
 
@@ -71,30 +84,48 @@ router.post('/google', async (req, res) => {
     }
 
     // Check if user already exists
-    let user = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     
-    if (user) {
-      // User exists, return user data
+    if (existingUser) {
+      // Check if existing user was registered with Google
+      if (existingUser.method !== 'google') {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'This email is already registered with email/password. Please use email login instead.' 
+        });
+      }
+      
+      // User exists and was registered with Google, return user data (LOGIN)
       return res.json({
         success: true,
-        message: 'Login successful',
+        message: 'Google login successful',
         user: {
-          id: user._id,
-          full_name: user.full_name,
-          email: user.email,
-          profile: user.profile,
-          method: user.method,
-          created_at: user.created_at
+          id: existingUser._id,
+          full_name: existingUser.full_name,
+          email: existingUser.email,
+          profile: existingUser.profile,
+          method: existingUser.method,
+          agreed_to_terms: existingUser.agreed_to_terms,
+          created_at: existingUser.created_at
         }
       });
     } else {
-      // Create new user for Google login
+      // User doesn't exist, validate agreement for NEW REGISTRATION
+      if (!agreed_to_terms) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'You must agree to the Terms of Service and Privacy Policy to register' 
+        });
+      }
+
+      // Create new Google user
       const newUser = new User({
         full_name: full_name.trim(),
         email: email.toLowerCase().trim(),
         password: null, // No password for Google users
         profile: profile || null,
         method: 'google',
+        agreed_to_terms: agreed_to_terms,
         created_at: new Date()
       });
 
@@ -102,13 +133,14 @@ router.post('/google', async (req, res) => {
 
       return res.status(201).json({
         success: true,
-        message: 'User registered successfully',
+        message: 'Google registration successful',
         user: {
           id: savedUser._id,
           full_name: savedUser.full_name,
           email: savedUser.email,
           profile: savedUser.profile,
           method: savedUser.method,
+          agreed_to_terms: savedUser.agreed_to_terms,
           created_at: savedUser.created_at
         }
       });
@@ -144,13 +176,29 @@ router.post('/google', async (req, res) => {
 // Register endpoint
 router.post('/register', async (req, res) => {
   try {
-    const { full_name, email, password, profile, method } = req.body;
+    const { full_name, email, password, profile, method, agreed_to_terms } = req.body;
 
     // Validate required fields
     if (!full_name || !email || !method) {
       return res.status(400).json({ 
         success: false, 
         message: 'Full name, email, and method are required' 
+      });
+    }
+
+    // Validate agreement to terms
+    if (!agreed_to_terms) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'You must agree to the Terms of Service and Privacy Policy to register' 
+      });
+    }
+
+    // Validate method
+    if (!['email', 'google'].includes(method)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid method. Use "email" or "google"' 
       });
     }
 
@@ -192,6 +240,7 @@ router.post('/register', async (req, res) => {
       password: hashedPassword,
       profile: method === 'google' ? profile : null,
       method,
+      agreed_to_terms: agreed_to_terms,
       created_at: new Date()
     });
 
@@ -206,6 +255,7 @@ router.post('/register', async (req, res) => {
         email: savedUser.email,
         profile: savedUser.profile,
         method: savedUser.method,
+        agreed_to_terms: savedUser.agreed_to_terms,
         created_at: savedUser.created_at
       }
     });

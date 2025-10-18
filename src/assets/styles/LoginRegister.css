@@ -581,3 +581,230 @@ body {
             animation: spin 1s linear infinite;
             margin-left: 8px;
         }
+
+/* Modal Styles for Terms and Privacy Policy */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    position: relative;
+}
+
+[data-theme="dark"] .modal-content {
+    background: #1a1a1a;
+    border: 1px solid #333333;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+[data-theme="dark"] .modal-header {
+    background: #2d2d2d;
+    border-bottom: 1px solid #404040;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #111827;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .modal-header h2 {
+    color: #f9fafb;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+[data-theme="dark"] .close-btn {
+    color: #d1d5db;
+}
+
+.close-btn:hover {
+    background-color: #f3f4f6;
+}
+
+[data-theme="dark"] .close-btn:hover {
+    background-color: #374151;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px);
+    background: #ffffff;
+}
+
+[data-theme="dark"] .modal-body {
+    background: #1a1a1a;
+}
+
+.modal-footer {
+    padding: 20px 24px;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+    display: flex;
+    justify-content: flex-end;
+}
+
+[data-theme="dark"] .modal-footer {
+    background: #2d2d2d;
+    border-top: 1px solid #404040;
+}
+
+.terms-content,
+.privacy-content {
+    line-height: 1.6;
+    color: #374151;
+}
+
+[data-theme="dark"] .terms-content,
+[data-theme="dark"] .privacy-content {
+    color: #d1d5db;
+}
+
+.terms-content h3,
+.privacy-content h3 {
+    color: #2563eb;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .terms-content h3,
+[data-theme="dark"] .privacy-content h3 {
+    color: #60a5fa;
+}
+
+.terms-content h3:first-child,
+.privacy-content h3:first-child {
+    margin-top: 0;
+}
+
+.terms-content p,
+.privacy-content p {
+    margin-bottom: 16px;
+    color: #6b7280;
+}
+
+[data-theme="dark"] .terms-content p,
+[data-theme="dark"] .privacy-content p {
+    color: #9ca3af;
+}
+
+.terms-content ul,
+.privacy-content ul {
+    margin-bottom: 16px;
+    padding-left: 20px;
+}
+
+.terms-content li,
+.privacy-content li {
+    margin-bottom: 8px;
+    color: #6b7280;
+}
+
+[data-theme="dark"] .terms-content li,
+[data-theme="dark"] .privacy-content li {
+    color: #9ca3af;
+}
+
+/* Agreement checkbox styles */
+.agreement-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+[data-theme="dark"] .agreement-checkbox {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+}
+
+.agreement-checkbox input[type="checkbox"] {
+    margin: 0;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.agreement-checkbox label {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #6b7280;
+    cursor: pointer;
+}
+
+[data-theme="dark"] .agreement-checkbox label {
+    color: #9ca3af;
+}
+
+.agreement-checkbox a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .agreement-checkbox a {
+    color: #60a5fa;
+}
+
+.agreement-checkbox a:hover {
+    text-decoration: underline;
+}
+
+.agreement-error {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+[data-theme="dark"] .agreement-error {
+    color: #f87171;
+}
+
+.agreement-error i {
+    font-size: 0.9rem;
+}

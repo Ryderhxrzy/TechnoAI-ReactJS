@@ -85,7 +85,8 @@ function Login(props) {
                     full_name: user.name,
                     email: user.email,
                     profile: user.picture,
-                    method: 'google'
+                    method: 'google',
+                    agreed_to_terms: true // Always send true for login attempts
                 })
             });
 
@@ -99,7 +100,14 @@ function Login(props) {
                 // Success message with custom styling
                 showCustomAlert('success', 'Welcome!', 'You have successfully logged in.');
             } else {
-                showCustomAlert('error', 'Login Failed', data.message || 'Google login failed');
+                // Handle specific error cases
+                if (data.message && data.message.includes('already registered with email/password')) {
+                    showCustomAlert('warning', 'Account Conflict', 'This email is already registered with email/password. Please use email login instead.');
+                } else if (data.message && data.message.includes('must agree to the Terms')) {
+                    showCustomAlert('warning', 'Registration Required', 'Please complete registration by agreeing to Terms of Service and Privacy Policy.');
+                } else {
+                    showCustomAlert('error', 'Login Failed', data.message || 'Google login failed');
+                }
             }
         } catch (error) {
             console.error("Google login error:", error);

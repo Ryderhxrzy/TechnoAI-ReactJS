@@ -6,6 +6,8 @@ import { useState, useEffect, useRef } from "react";
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
+import TermsOfService from '../components/TermsOfService';
+import PrivacyPolicy from '../components/PrivacyPolicy';
 
 function Register(props) {
     const [theme, setTheme] = useState(() => {
@@ -14,6 +16,10 @@ function Register(props) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [agreementError, setAgreementError] = useState('');
 
     const passwordRef = useRef(null);
     const confirmPasswordRef = useRef(null);
@@ -170,6 +176,7 @@ function Register(props) {
                 email: user.email,
                 profile: user.picture,
                 method: 'google',
+                agreed_to_terms: true
             };
 
             // Register user in MongoDB
@@ -183,10 +190,27 @@ function Register(props) {
             }
         } catch (error) {
             console.error("Google registration failed:", error);
-            await showErrorAlert(
-                '❌ Registration Failed', 
-                error.message || 'Google registration failed. Please try again.'
-            );
+            
+            // Check if it's an existing user error
+            if (error.message && error.message.includes('already registered with email/password')) {
+                await showErrorAlert(
+                    '⚠️ Account Conflict', 
+                    'This email is already registered with email/password. Please use email login instead.',
+                    'warning'
+                );
+            } else if (error.message && error.message.includes('must agree to the Terms')) {
+                // Only show agreement error for new registrations
+                await showErrorAlert(
+                    '⚠️ Agreement Required', 
+                    'You must agree to the Terms of Service and Privacy Policy to register.',
+                    'warning'
+                );
+            } else {
+                await showErrorAlert(
+                    '❌ Registration Failed', 
+                    error.message || 'Google registration failed. Please try again.'
+                );
+            }
         } finally {
             setIsLoading(false);
         }
@@ -200,8 +224,42 @@ function Register(props) {
         );
     };
 
+    const handleTermsClick = (e) => {
+        e.preventDefault();
+        setShowTermsModal(true);
+    };
+
+    const handlePrivacyClick = (e) => {
+        e.preventDefault();
+        setShowPrivacyModal(true);
+    };
+
+    const handleAgreementChange = (e) => {
+        setAgreedToTerms(e.target.checked);
+        setAgreementError('');
+    };
+
+    const validateAgreement = () => {
+        if (!agreedToTerms) {
+            setAgreementError('You must agree to the Terms of Service and Privacy Policy to continue.');
+            return false;
+        }
+        setAgreementError('');
+        return true;
+    };
+
     const handleRegularSignup = async (e) => {
         e.preventDefault();
+        
+        if (!validateAgreement()) {
+            await showErrorAlert(
+                '⚠️ Agreement Required', 
+                'You must agree to the Terms of Service and Privacy Policy to continue.',
+                'warning'
+            );
+            return;
+        }
+
         setIsLoading(true);
         
         const formData = new FormData(e.target);
@@ -233,6 +291,7 @@ function Register(props) {
             email: formData.get('email'),
             password: password,
             method: 'email',
+            agreed_to_terms: true
         };
 
         try {
@@ -383,12 +442,24 @@ function Register(props) {
                         </div>
                     </div>
 
-                    <div className="form-options">
-                        <label className="remember-me">
-                            <input type="checkbox" name="terms" id="terms" required disabled={isLoading} />
-                            <span>I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a></span>
+                    <div className="agreement-checkbox">
+                        <input 
+                            type="checkbox" 
+                            id="terms" 
+                            checked={agreedToTerms}
+                            onChange={handleAgreementChange}
+                            disabled={isLoading}
+                        />
+                        <label htmlFor="terms">
+                            I agree to the <a href="#terms" onClick={handleTermsClick}>Terms of Service</a> and <a href="#privacy" onClick={handlePrivacyClick}>Privacy Policy</a>
                         </label>
                     </div>
+                    {agreementError && (
+                        <div className="agreement-error">
+                            <i className="fas fa-exclamation-triangle"></i>
+                            {agreementError}
+                        </div>
+                    )}
 
                     <button type="submit" className="btn btn-primary" disabled={isLoading}>
                         {isLoading ? (
@@ -418,6 +489,16 @@ function Register(props) {
                     </div>
                 </form>
             </div>
+
+            {/* Terms of Service Modal */}
+            {showTermsModal && (
+                <TermsOfService onClose={() => setShowTermsModal(false)} />
+            )}
+
+            {/* Privacy Policy Modal */}
+            {showPrivacyModal && (
+                <PrivacyPolicy onClose={() => setShowPrivacyModal(false)} />
+            )}
         </>
     );
 }

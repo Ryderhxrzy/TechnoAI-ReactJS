@@ -296,8 +296,27 @@ function LandingPage({ onNavigateToLogin, onNavigateToRegister }) {
                         </div>
                     </div>
                     <div className="footer-bottom">
+                        <div className="footer-legal">
+                            <a 
+                                href="/privacy-policy.html" 
+                                className="footer-legal-link"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Privacy Policy
+                            </a>
+                            <span className="footer-separator">|</span>
+                            <a 
+                                href="/terms-of-service.html" 
+                                className="footer-legal-link"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Terms of Service
+                            </a>
+                        </div>
                         <p className="footer-copyright">
-                            © 2024 Techno.ai. Built for BSIT students at Bestlink College of the Philippines.
+                            © 2025 Techno.ai. Built for BSIT students at Bestlink College of the Philippines.
                         </p>
                     </div>
                 </div>

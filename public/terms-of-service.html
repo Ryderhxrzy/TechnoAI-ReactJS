@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Techno.ai</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="../src/assets/styles/styles.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            /* Light mode colors - matching your existing design */
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --bg-tertiary: #ebeff5;
+            --bg-elevated: #f6f8fa;
+            --bg-input: #eff1f3;
+            --utility-button-bg: #EEEEEE;
+            
+            --text-primary: #1a1a1a;
+            --text-primary1: #E0E0E0;
+            --text-secondary: #4a5568;
+            --text-tertiary: #718096;
+            --text-muted: #a0aec0;
+            --text-icon: #a0aec0;
+            --text-bg: #0f0c05a8;
+            
+            --border-primary: #e2e8f0;
+            --border-secondary: #d0d9e6;
+            --border-focus: #4299e1;
+            
+            --accent-primary: #0085d1;
+            --accent-hover: #0095f0;
+            --sub-accent: #0084d18c;
+            --accent-hover1: #0094f07d;
+            --gradient-main: linear-gradient(135deg, #0085d1 0%, #0095f0 100%);
+            
+            --accent-light: #e0e6ed;
+            --accent-light-hover: #d0d8e3;
+            --accent-border: #c2ccd6;
+            
+            --success: #38a169;
+            --warning: #d69e2e;
+            --error: #e53e3e;
+            
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1E1E1E;
+            --bg-secondary: #22272e;
+            --bg-tertiary: #4a5568;
+            --bg-elevated: #1c2128;
+            --bg-input: #2b3136;
+            --bg-user-message: #2e353f;
+            
+            --text-primary: #E0E0E0;
+            --text-primary1: #1a1a1a;
+            --text-secondary: #A0A0A0;
+            --text-tertiary: #cbd5e0;
+            --text-muted: #a0aec0;
+            --text-links: #90CAF9;
+            --text-icon: #718096;
+            --text-bg: #f8be4aa8;
+            
+            --border-primary: #333333;
+            --border-secondary: #333333;
+            --border-focus: #5641f5;
+            
+            --accent-primary: #0085d1;
+            --accent-hover: #0095f0;
+            
+            --accent-light: #2b3136;
+            --accent-light-hover: #364147;
+            --accent-border: #3d464d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        [data-theme="dark"] .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #333333;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        [data-theme="dark"] .modal-header {
+            background: #2d2d2d;
+            border-bottom: 1px solid #404040;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #111827;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .modal-header h2 {
+            color: #f9fafb;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
+            background: #ffffff;
+        }
+
+        [data-theme="dark"] .modal-body {
+            background: #1a1a1a;
+        }
+
+        .terms-content {
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        [data-theme="dark"] .terms-content {
+            color: #d1d5db;
+        }
+
+        .terms-content h3 {
+            color: #2563eb;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .terms-content h3 {
+            color: #60a5fa;
+        }
+
+        .terms-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .terms-content p {
+            margin-bottom: 16px;
+            color: #6b7280;
+        }
+
+        [data-theme="dark"] .terms-content p {
+            color: #9ca3af;
+        }
+
+        .terms-content ul {
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+
+        .terms-content li {
+            margin-bottom: 8px;
+            color: #6b7280;
+        }
+
+        [data-theme="dark"] .terms-content li {
+            color: #9ca3af;
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent-light);
+            transform: scale(1.05);
+        }
+
+
+        .last-updated {
+            background: var(--bg-elevated);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 30px;
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .last-updated strong {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .logo-text {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
+
+    <div class="container">
+        <a href="/" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+
+        <div class="modal-content">
+            <div class="modal-header">
+                        <h3>Terms of Service</h2>
+            </div>
+            <div class="modal-body">
+                <div class="terms-content">
+                    <h3>1. Acceptance of Terms</h3>
+            <p>By accessing and using Techno.ai, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
+
+                    <h3>2. Use License</h3>
+            <p>Permission is granted to temporarily use Techno.ai for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+            <ul>
+                <li>modify or copy the materials</li>
+                <li>use the materials for any commercial purpose or for any public display</li>
+                <li>attempt to reverse engineer any software contained on the website</li>
+                <li>remove any copyright or other proprietary notations from the materials</li>
+            </ul>
+
+                    <h3>3. User Accounts</h3>
+            <p>When you create an account with us, you must provide information that is accurate, complete, and current at all times. You are responsible for safeguarding the password and for all activities that occur under your account.</p>
+
+                    <h3>4. Prohibited Uses</h3>
+            <p>You may not use our service:</p>
+            <ul>
+                <li>For any unlawful purpose or to solicit others to perform unlawful acts</li>
+                <li>To violate any international, federal, provincial, or state regulations, rules, laws, or local ordinances</li>
+                <li>To infringe upon or violate our intellectual property rights or the intellectual property rights of others</li>
+                <li>To harass, abuse, insult, harm, defame, slander, disparage, intimidate, or discriminate</li>
+                <li>To submit false or misleading information</li>
+            </ul>
+
+                    <h3>5. Content</h3>
+            <p>Our service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material. You are responsible for the content that you post to the service.</p>
+
+                    <h3>6. Privacy Policy</h3>
+            <p>Your privacy is important to us. Please review our <a href="/privacy-policy.html" style="color: var(--accent-primary); text-decoration: none;">Privacy Policy</a>, which also governs your use of the service, to understand our practices.</p>
+
+                    <h3>7. Termination</h3>
+            <p>We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
+
+                    <h3>8. Disclaimer</h3>
+            <p>The information on this service is provided on an "as is" basis. To the fullest extent permitted by law, this Company excludes all representations, warranties, conditions and terms relating to our service.</p>
+
+                    <h3>9. Limitation of Liability</h3>
+            <p>In no event shall Techno.ai, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.</p>
+
+                    <h3>10. Governing Law</h3>
+            <p>These Terms shall be interpreted and governed by the laws of the jurisdiction in which our company is located, without regard to its conflict of law provisions.</p>
+
+                    <h3>11. Changes to Terms</h3>
+            <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days notice prior to any new terms taking effect.</p>
+
+                    <h3>12. Contact Information</h3>
+            <p>If you have any questions about these Terms of Service, please contact us at support@techno.ai</p>
+
+                    <div class="last-updated">
+                        <p><strong>Last Updated:</strong> <span id="lastUpdated"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme functionality
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            const icon = document.getElementById('theme-icon');
+            icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            const icon = document.getElementById('theme-icon');
+            icon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Set last updated date
+        function setLastUpdated() {
+            const dateElement = document.getElementById('lastUpdated');
+            dateElement.textContent = new Date().toLocaleDateString();
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            setLastUpdated();
+        });
+    </script>
+</body>
+</html>

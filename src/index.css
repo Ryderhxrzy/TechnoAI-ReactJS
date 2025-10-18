@@ -9,6 +9,7 @@
   --utility-button-bg: #EEEEEE;
   
   --text-primary: #1a1a1a;
+  --text-primary1: #E0E0E0;
   --text-secondary: #4a5568;
   --text-tertiary: #718096;
   --text-muted: #a0aec0;
@@ -23,6 +24,10 @@
   --accent-primary: #0085d1;
   --accent-hover: #0095f0;
   --sub-accent: #0084d18c;
+
+  --accent-hover1: #0094f07d;
+
+  --gradient-main: linear-gradient(135deg, #0085d1 0%, #0095f0 100%);
   
   --accent-light: #e0e6ed;
   --accent-light-hover: #d0d8e3;  
@@ -89,6 +94,7 @@
   --bg-user-message: #2e353f;
 
   --text-primary: #E0E0E0;
+  --text-primary1: #1a1a1a;
   --text-secondary: #A0A0A0;
   --text-tertiary: #cbd5e0;
   --text-muted: #a0aec0;
