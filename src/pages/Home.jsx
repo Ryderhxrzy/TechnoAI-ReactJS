@@ -337,7 +337,7 @@ function isGreeting(message) {
   return greetingPatterns.some(pattern => pattern.test(message.trim()));
 }
 
-function enhancePromptForSteps(userMessage, userName = "", options = {}) {
+/*function enhancePromptForSteps(userMessage, userName = "", options = {}) {
   const roleName = options.roleName || "Techno.ai";
   const preferTagalog = !!options.preferTagalog;
   const audience = options.audience || "student";
@@ -422,7 +422,7 @@ Now answer: "${userMessage}"
 if (typeof window !== "undefined") {
   window.isGreeting = isGreeting;
   window.enhancePromptForSteps = enhancePromptForSteps;
-}
+}*/
 
 
 function Home({ onLogout }) {
@@ -800,9 +800,26 @@ function Home({ onLogout }) {
   };
 
   // Send message to Gemini API
+  // Send message to Gemini API - FIXED VERSION
   const sendToGemini = async (userMessage) => {
     try {      
       console.log('Sending message to backend:', userMessage);
+      
+      // Get user info for personalization
+      const savedUserInfo = localStorage.getItem("userInfo");
+      let userName = "";
+      if (savedUserInfo) {
+        const parsedUser = JSON.parse(savedUserInfo);
+        userName = parsedUser.full_name || parsedUser.name || "";
+      }
+      
+      // Enhance the prompt using enhancePromptForSteps
+      const enhancedMessage = enhancePromptForSteps(userMessage, userName, {
+        roleName: "Techno.ai",
+        audience: "student"
+      });
+      
+      console.log('Enhanced prompt:', enhancedMessage);
       
       const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
         method: 'POST',
@@ -810,17 +827,17 @@ function Home({ onLogout }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          message: userMessage 
+          message: enhancedMessage  // Send the enhanced prompt instead of raw message
         })
       });
-  
+
       const data = await response.json();
       
       if (!response.ok) {
         console.error('Backend API error:', data);
         throw new Error(data.error || `HTTP ${response.status}: API request failed`);
       }
-  
+
       if (data.success && data.response) {
         return data.response;
       } else {
