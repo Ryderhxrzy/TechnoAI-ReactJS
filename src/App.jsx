@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Home from './pages/Home.jsx'; // Import Home instead of Profile
+import LandingPage from './pages/LandingPage.jsx';
 
 function App() {
-    const [currentPage, setCurrentPage] = useState('login');
+    const [currentPage, setCurrentPage] = useState('landing');
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -53,6 +54,10 @@ function App() {
         setCurrentPage('login');
     };
 
+    const handleNavigateToLanding = () => {
+        setCurrentPage('landing');
+    };
+
     const handleRegisterSuccess = (userData) => {
         if (userData) {
             localStorage.setItem('userInfo', JSON.stringify(userData));
@@ -80,10 +85,18 @@ function App() {
 
     return (
         <>
+            {currentPage === 'landing' && (
+                <LandingPage 
+                    onNavigateToLogin={handleNavigateToLogin}
+                    onNavigateToRegister={handleNavigateToRegister}
+                />
+            )}
+            
             {currentPage === 'login' && (
                 <Login 
                     onLoginSuccess={handleLoginSuccess}
                     onNavigateToRegister={handleNavigateToRegister}
+                    onNavigateToLanding={handleNavigateToLanding}
                 />
             )}
             
@@ -91,6 +104,7 @@ function App() {
                 <Register 
                     onRegisterSuccess={handleRegisterSuccess}
                     onNavigateToLogin={handleNavigateToLogin}
+                    onNavigateToLanding={handleNavigateToLanding}
                 />
             )}
             

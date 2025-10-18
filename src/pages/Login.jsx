@@ -180,6 +180,14 @@ function Login(props) {
                     </div>
                     <h1 className="login-title">Welcome back</h1>
                     <p className="login-subtitle">Sign in to your account to continue</p>
+                    <button 
+                        className="back-to-landing" 
+                        onClick={props.onNavigateToLanding}
+                        title="Back to Home"
+                    >
+                        <i className="fas fa-arrow-left"></i>
+                        Back to Home
+                    </button>
                 </div>
 
                 <form className="login-form" onSubmit={handleEmailLogin}>

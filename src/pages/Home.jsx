@@ -460,6 +460,13 @@ function Home({ onLogout }) {
   const [showLogoutDropdown, setShowLogoutDropdown] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [apiStatus, setApiStatus] = useState("checking");
+  
+  // Chat conversation states
+  const [conversationTitles, setConversationTitles] = useState([]);
+  const [currentChatTitle, setCurrentChatTitle] = useState("Welcome Chat");
+  const [currentSequence, setCurrentSequence] = useState(0);
+  const [userId, setUserId] = useState(null);
+  const [loadingConversations, setLoadingConversations] = useState(false);
 
   // Voice recording states
   const [isRecording, setIsRecording] = useState(false);
@@ -576,7 +583,181 @@ function Home({ onLogout }) {
   // Check API key on component mount
   useEffect(() => {
     checkApiKey();
+    initializeUser();
+    testBackendConnection();
   }, []);
+
+  // Test backend connection
+  const testBackendConnection = async () => {
+    try {
+      console.log('Testing backend connection...');
+      const response = await fetch('http://localhost:5000/');
+      if (response.ok) {
+        const data = await response.text();
+        console.log('Backend is running:', data);
+      } else {
+        console.error('Backend responded with error:', response.status);
+      }
+    } catch (error) {
+      console.error('Backend connection failed:', error);
+      console.error('Please make sure the backend server is running on port 5000');
+    }
+  };
+
+  // Load conversation titles when userId changes
+  useEffect(() => {
+    if (userId) {
+      loadConversationTitles();
+    }
+  }, [userId]);
+
+  // Refresh conversation titles when currentChatTitle changes (after new chat)
+  useEffect(() => {
+    if (userId && currentChatTitle !== "Welcome Chat") {
+      loadConversationTitles();
+    }
+  }, [currentChatTitle, userId]);
+
+  // Initialize user ID and load conversation titles
+  const initializeUser = () => {
+    try {
+      const savedUserInfo = localStorage.getItem("userInfo");
+      if (savedUserInfo) {
+        const parsedUser = JSON.parse(savedUserInfo);
+        // Use email as a temporary user ID, in production you'd have a proper user ID
+        const tempUserId = parsedUser.email || "temp_user_" + Date.now();
+        setUserId(tempUserId);
+      }
+    } catch (error) {
+      console.error("Error initializing user:", error);
+    }
+  };
+
+  // Load conversation titles from database
+  const loadConversationTitles = async () => {
+    if (!userId) {
+      console.log('No user ID available for loading conversation titles');
+      return;
+    }
+    
+    setLoadingConversations(true);
+    try {
+      console.log('Loading conversation titles for user:', userId);
+      const response = await fetch(`http://localhost:5000/api/messages/titles/${encodeURIComponent(userId)}`);
+      if (response.ok) {
+        const titles = await response.json();
+        console.log('Loaded conversation titles:', titles);
+        setConversationTitles(titles);
+      } else {
+        console.error('Failed to load conversation titles:', response.status);
+      }
+    } catch (error) {
+      console.error("Error loading conversation titles:", error);
+    } finally {
+      setLoadingConversations(false);
+    }
+  };
+
+  // Save messages to database
+  const saveMessagesToDB = async (messages) => {
+    if (!userId) {
+      console.error('No user ID available for saving messages');
+      return;
+    }
+    
+    try {
+      console.log('Saving messages to database:', messages);
+      console.log('Backend URL: http://localhost:5000/api/messages/batch');
+      
+      const response = await fetch('http://localhost:5000/api/messages/batch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages })
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      if (response.ok) {
+        const savedMessages = await response.json();
+        console.log('Messages saved to database successfully:', savedMessages.length);
+        console.log('Saved messages:', savedMessages);
+        loadConversationTitles(); // Refresh conversation titles
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to save messages to database:', response.status, errorData);
+      }
+    } catch (error) {
+      console.error('Error saving messages to database:', error);
+      console.error('This might mean the backend server is not running on port 5000');
+    }
+  };
+
+  // Load messages for a specific chat title
+  const loadChatMessages = async (title) => {
+    if (!userId) return;
+    
+    try {
+      const response = await fetch(`http://localhost:5000/api/messages/chat/${encodeURIComponent(userId)}/${encodeURIComponent(title)}`);
+      if (response.ok) {
+        const messages = await response.json();
+        console.log('Raw messages from database:', messages);
+        console.log('Number of messages received:', messages.length);
+        console.log('Message details:', messages.map(m => ({ 
+          id: m._id, 
+          sender: m.sender, 
+          sequence: m.sequence, 
+          content: m.content.substring(0, 50) + '...' 
+        })));
+        
+        // Convert database messages to chat format
+        const chatMessages = messages.map(msg => {
+          const isUserMessage = msg.sender === userId;
+          let formattedText = null;
+          
+          if (!isUserMessage) {
+            try {
+              formattedText = formatBotResponse(msg.content, "Previous conversation");
+              // If formattedText is empty or just whitespace, fall back to plain text
+              if (!formattedText || formattedText.trim().length === 0) {
+                formattedText = null;
+              }
+            } catch (error) {
+              console.error('Error formatting bot response:', error);
+              formattedText = null;
+            }
+          }
+          
+          console.log(`Message ${msg._id}:`, {
+            sender: msg.sender,
+            isUserMessage,
+            content: msg.content.substring(0, 50) + '...',
+            hasFormattedText: !!formattedText,
+            formattedTextLength: formattedText ? formattedText.length : 0
+          });
+          
+          return {
+            id: msg._id,
+            text: msg.content,
+            sender: isUserMessage ? "user" : "bot",
+            timestamp: new Date(msg.timestamp),
+            formattedText: formattedText
+          };
+        });
+        
+        console.log('Converted chat messages:', chatMessages);
+        setChatMessages(chatMessages);
+        setCurrentSequence(messages.length);
+        console.log('Loaded chat messages:', chatMessages.length);
+      } else {
+        console.error('Failed to load chat messages:', response.status);
+      }
+    } catch (error) {
+      console.error("Error loading chat messages:", error);
+    }
+  };
 
   const checkApiKey = () => {
     const apiKey = import.meta.env.VITE_APP_GEMINI_API_KEY;
@@ -952,6 +1133,13 @@ function Home({ onLogout }) {
     setMessage("");
     setIsTyping(true);
 
+    // Update chat title on first message
+    let finalChatTitle = currentChatTitle;
+    if (chatMessages.length === 0) {
+      finalChatTitle = generateShortTitle(currentMessage);
+      setCurrentChatTitle(finalChatTitle);
+    }
+
     try {
       const aiResponse = await sendToGemini(currentMessage);
       
@@ -964,6 +1152,32 @@ function Home({ onLogout }) {
       };
 
       setChatMessages((prev) => [...prev, botMessage]);
+
+      // Save messages to database
+      if (userId) {
+        const messagesToSave = [
+          {
+            chat_title: finalChatTitle,
+            sender: userId,
+            content: currentMessage,
+            has_code: /```[\s\S]*?```/.test(currentMessage),
+            sequence: currentSequence + 1
+          },
+          {
+            chat_title: finalChatTitle,
+            sender: "bot", // Use "bot" as sender for AI responses
+            content: aiResponse,
+            has_code: /```[\s\S]*?```/.test(aiResponse),
+            sequence: currentSequence + 2
+          }
+        ];
+        
+        console.log('About to save messages to database:', messagesToSave);
+        await saveMessagesToDB(messagesToSave);
+        setCurrentSequence(prev => prev + 2);
+      } else {
+        console.error('No userId available for saving messages');
+      }
     } catch (error) {
       console.error("Error:", error);
       
@@ -1048,11 +1262,26 @@ function Home({ onLogout }) {
   const startNewChat = () => {
     setChatMessages([]);
     setIsTyping(false);
+    setCurrentSequence(0);
+    setCurrentChatTitle("New Chat " + new Date().toLocaleDateString());
   };
 
   // Function to handle copy button clicks safely
   const handleCopyClick = (text) => {
     copyToClipboard(text);
+  };
+
+  // Handle conversation title click
+  const handleConversationClick = (title) => {
+    console.log('Loading conversation:', title);
+    setCurrentChatTitle(title);
+    loadChatMessages(title);
+  };
+
+  // Update chat title based on first message
+  const updateChatTitle = (firstMessage) => {
+    const newTitle = generateShortTitle(firstMessage);
+    setCurrentChatTitle(newTitle);
   };
 
   return (
@@ -1085,11 +1314,35 @@ function Home({ onLogout }) {
 
         {/* Chat history */}
         <div className="chat-history" id="chat-history">
-          <div className="chat-item active" data-chat-id="1">
-            <div className="chat-title">Welcome Chat</div>
-            <div className="chat-preview">How can I help you today?</div>
-            <div className="chat-time">Just now</div>
-          </div>
+          {loadingConversations ? (
+            <div className="chat-item">
+              <div className="chat-title">Loading conversations...</div>
+              <div className="chat-preview">Please wait</div>
+            </div>
+          ) : (
+            <>
+              {conversationTitles.map((conversation, index) => (
+                <div 
+                  key={index}
+                  className={`chat-item ${conversation.title === currentChatTitle ? 'active' : ''}`}
+                  onClick={() => handleConversationClick(conversation.title)}
+                >
+                  <div className="chat-title">{conversation.title}</div>
+                  <div className="chat-preview">Click to view conversation</div>
+                  <div className="chat-time">
+                    {new Date(conversation.lastMessage).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+              {conversationTitles.length === 0 && !loadingConversations && (
+                <div className="chat-item active" data-chat-id="1">
+                  <div className="chat-title">Welcome Chat</div>
+                  <div className="chat-preview">How can I help you today?</div>
+                  <div className="chat-time">Just now</div>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* User profile with logout dropdown and logout icon */}
@@ -1206,29 +1459,38 @@ function Home({ onLogout }) {
             </div>
           ) : (
             <div className="messages-container">
-              {chatMessages.map((msg) => (
-                <div 
-                  key={msg.id} 
-                  className={`message ${msg.sender}-message ${msg.isError ? 'error-message' : ''}`}
-                >
-                  {msg.sender === "bot" && msg.formattedText ? (
-                    <div 
-                      dangerouslySetInnerHTML={{ __html: msg.formattedText }}
-                      onClick={(e) => {
-                        // Handle copy button clicks within the formatted text
-                        if (e.target.classList.contains('copy-btn')) {
-                          const copyText = e.target.getAttribute('data-copy-text');
-                          if (copyText) {
-                            handleCopyClick(copyText);
+              {chatMessages.map((msg) => {
+                console.log('Rendering message:', {
+                  id: msg.id,
+                  sender: msg.sender,
+                  hasFormattedText: !!msg.formattedText,
+                  textLength: msg.text ? msg.text.length : 0,
+                  formattedTextLength: msg.formattedText ? msg.formattedText.length : 0
+                });
+                return (
+                  <div 
+                    key={msg.id} 
+                    className={`message ${msg.sender}-message ${msg.isError ? 'error-message' : ''}`}
+                  >
+                    {msg.sender === "bot" && msg.formattedText ? (
+                      <div 
+                        dangerouslySetInnerHTML={{ __html: msg.formattedText }}
+                        onClick={(e) => {
+                          // Handle copy button clicks within the formatted text
+                          if (e.target.classList.contains('copy-btn')) {
+                            const copyText = e.target.getAttribute('data-copy-text');
+                            if (copyText) {
+                              handleCopyClick(copyText);
+                            }
                           }
-                        }
-                      }}
-                    />
-                  ) : (
-                    msg.text
-                  )}
-                </div>
-              ))}
+                        }}
+                      />
+                    ) : (
+                      <div>{msg.text || 'No content'}</div>
+                    )}
+                  </div>
+                );
+              })}
               
               {isTyping && (
                 <div className="typing-indicator show">

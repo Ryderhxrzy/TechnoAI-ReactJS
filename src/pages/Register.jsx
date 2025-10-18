@@ -279,6 +279,14 @@ function Register(props) {
                     </div>
                     <h1 className="login-title">Create your account</h1>
                     <p className="login-subtitle">Sign up to get started with Techno.ai</p>
+                    <button 
+                        className="back-to-landing" 
+                        onClick={props.onNavigateToLanding}
+                        title="Back to Home"
+                    >
+                        <i className="fas fa-arrow-left"></i>
+                        Back to Home
+                    </button>
                 </div>
 
                 <form className="login-form" onSubmit={handleRegularSignup}>

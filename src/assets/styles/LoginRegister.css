@@ -162,7 +162,28 @@ body {
         .login-subtitle {
             font-size: 0.875rem;
             color: var(--text-secondary);
-            margin-bottom: 0;
+            margin-bottom: 16px;
+        }
+
+        .back-to-landing {
+            background: none;
+            border: 1px solid var(--border-primary);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+        }
+
+        .back-to-landing:hover {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
         }
 
         /* Form */
