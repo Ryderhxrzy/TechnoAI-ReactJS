@@ -1,54 +1,29 @@
-// backend/routes/health.js
-const express = require('express');
+// routes/ai.js
+import express from 'express';
 const router = express.Router();
 
-// backend/routes/ai.js - Add this route
-router.get('/health', async (req, res) => {
-  try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    
-    if (!apiKey) {
-      return res.status(503).json({
-        status: 'error',
-        message: 'Gemini API key not configured in backend'
-      });
-    }
-
-    // Optional: Test the API key with a simple request
-    const testResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-goog-api-key': apiKey
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: 'Hello' }]
-        }],
-        generationConfig: {
-          maxOutputTokens: 10
-        }
-      })
-    });
-
-    if (testResponse.ok) {
-      res.json({
-        status: 'ok',
-        message: 'Backend and Gemini API are working properly'
-      });
-    } else {
-      res.status(503).json({
-        status: 'error',
-        message: 'Gemini API is not responding correctly'
-      });
-    }
-    
-  } catch (error) {
-    res.status(503).json({
-      status: 'error',
-      message: 'Backend service error: ' + error.message
-    });
-  }
+// This creates: GET /api/ai/health
+router.get('/health', (req, res) => {
+  console.log('AI Health route called');
+  
+  const apiKey = process.env.GEMINI_API_KEY;
+  console.log('GEMINI_API_KEY exists:', !!apiKey);
+  
+  res.json({ 
+    status: 'ok', 
+    message: 'AI Health route is working',
+    geminiConfigured: !!apiKey,
+    timestamp: new Date().toISOString()
+  });
 });
 
-module.exports = router;
+// Add a root route for /api/ai
+router.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'AI API is working',
+    timestamp: new Date().toISOString()
+  });
+});
+
+export default router; // ✅ Make sure this export exists
