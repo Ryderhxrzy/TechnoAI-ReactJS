@@ -759,33 +759,44 @@ function Home({ onLogout }) {
     }
   };
 
-  const checkApiKey = () => {
-    const apiKey = import.meta.env.VITE_APP_GEMINI_API_KEY;
-    
-    if (!apiKey) {
+  const checkApiKey = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+      
+      // Test backend connection and API key configuration
+      const response = await fetch(`${API_BASE_URL}/api/ai/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok && data.status === 'ok') {
+        setApiStatus("available");
+        return true;
+      } else {
+        setApiStatus("unavailable");
+        Swal.fire({
+          title: 'Service Unavailable',
+          text: data.message || 'AI service is currently unavailable. Please try again later.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error('Backend connection failed:', error);
       setApiStatus("unavailable");
       Swal.fire({
-        title: 'API Key Missing',
-        text: 'Gemini API key is not configured in .env file',
+        title: 'Connection Error',
+        text: 'Cannot connect to the AI service. Please make sure the backend server is running.',
         icon: 'error',
         confirmButtonText: 'OK'
       });
       return false;
     }
-
-    if (!apiKey.startsWith('AIza')) {
-      setApiStatus("unavailable");
-      Swal.fire({
-        title: 'Invalid API Key Format',
-        text: 'API key should start with "AIza"',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      return false;
-    }
-
-    setApiStatus("available");
-    return true;
   };
 
   // Send message to Gemini API

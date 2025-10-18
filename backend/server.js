@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import messageRoutes from "./routes/messages.js";
 import aiRoutes from "./routes/ai.js";
+import healthRoutes from "./routes/health.js";
 
 /* Load environment variables from the root directory
 dotenv.config({ path: '../.env' });*/
@@ -50,6 +51,7 @@ mongoose
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/health", healthRoutes);
 // ✅ Test route
 app.get("/", (req, res) => {
   res.send("API is working 🚀");
