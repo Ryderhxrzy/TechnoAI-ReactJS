@@ -8,11 +8,10 @@ import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import Home from './Home';
 import Swal from 'sweetalert2';
+import { loginUser, googleLogin } from "./api"; // ✅ use API functions
 
 function Login(props) {
-    const [theme, setTheme] = useState(() => {
-        return localStorage.getItem("theme") || "light";
-    });
+    const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
     const [showPassword, setShowPassword] = useState(false);
     const [currentPage, setCurrentPage] = useState('login');
     const [isLoading, setIsLoading] = useState(false);
@@ -36,13 +35,12 @@ function Login(props) {
         localStorage.setItem("theme", theme);
     }, [theme]);
 
-    // Custom SweetAlert configuration function matching your design
     const showCustomAlert = (icon, title, text, confirmButtonText = 'OK') => {
         return Swal.fire({
-            icon: icon,
-            title: title,
-            text: text,
-            confirmButtonText: confirmButtonText,
+            icon,
+            title,
+            text,
+            confirmButtonText,
             customClass: {
                 popup: 'login-swal',
                 title: 'login-swal-title',
@@ -58,52 +56,35 @@ function Login(props) {
     };
 
     const toggleTheme = () => {
-        setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+        setTheme(prev => prev === "dark" ? "light" : "dark");
     };
 
     const togglePassword = () => {
-        setShowPassword((prev) => !prev);
+        setShowPassword(prev => !prev);
         if (passwordRef.current) {
             passwordRef.current.type = passwordRef.current.type === "password" ? "text" : "password";
         }
     };
 
+    // ✅ GOOGLE LOGIN HANDLER
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
             setIsLoading(true);
             const token = credentialResponse.credential;
             const user = jwtDecode(token);
-
             console.log("Google User:", user);
 
-            const response = await fetch('http://localhost:5000/api/auth/google', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    full_name: user.name,
-                    email: user.email,
-                    profile: user.picture,
-                    method: 'google',
-                    agreed_to_terms: true // Always send true for login attempts
-                })
-            });
-
-            const data = await response.json();
+            const data = await googleLogin(user);
 
             if (data.success) {
                 localStorage.setItem('userInfo', JSON.stringify(data.user));
                 props.onLoginSuccess();
                 setCurrentPage('home');
-                
-                // Success message with custom styling
                 showCustomAlert('success', 'Welcome!', 'You have successfully logged in.');
             } else {
-                // Handle specific error cases
-                if (data.message && data.message.includes('already registered with email/password')) {
+                if (data.message?.includes('already registered with email/password')) {
                     showCustomAlert('warning', 'Account Conflict', 'This email is already registered with email/password. Please use email login instead.');
-                } else if (data.message && data.message.includes('must agree to the Terms')) {
+                } else if (data.message?.includes('must agree to the Terms')) {
                     showCustomAlert('warning', 'Registration Required', 'Please complete registration by agreeing to Terms of Service and Privacy Policy.');
                 } else {
                     showCustomAlert('error', 'Login Failed', data.message || 'Google login failed');
@@ -118,13 +99,13 @@ function Login(props) {
     };
 
     const handleGoogleError = () => {
-        console.error("Google Login Failed");
         showCustomAlert('error', 'Google Login Failed', 'Please try again');
     };
 
+    // ✅ EMAIL LOGIN HANDLER
     const handleEmailLogin = async (e) => {
         e.preventDefault();
-        
+
         const email = emailRef.current?.value;
         const password = passwordRef.current?.value;
 
@@ -135,23 +116,12 @@ function Login(props) {
 
         try {
             setIsLoading(true);
-            
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password })
-            });
-
-            const data = await response.json();
+            const data = await loginUser(email, password);
 
             if (data.success) {
                 localStorage.setItem('userInfo', JSON.stringify(data.user));
                 props.onLoginSuccess();
                 setCurrentPage('home');
-                
-                // Success message with custom styling
                 showCustomAlert('success', 'Welcome Back!', 'You have successfully logged in.');
             } else {
                 showCustomAlert('error', 'Login Failed', data.message || 'Invalid credentials');
@@ -163,10 +133,6 @@ function Login(props) {
             setIsLoading(false);
         }
     };
-
-    if (currentPage === 'register') {
-        return <Register />;
-    }
 
     if (currentPage === 'home') {
         return <Home />;
@@ -236,7 +202,12 @@ function Login(props) {
                                 required
                                 minLength="6"
                             />
-                            <button type="button" onClick={togglePassword} className="password-toggle" aria-label='Toggle password visibility'>
+                            <button 
+                                type="button" 
+                                onClick={togglePassword} 
+                                className="password-toggle" 
+                                aria-label='Toggle password visibility'
+                            >
                                 <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} id="password-icon"></i>
                             </button>
                         </div>

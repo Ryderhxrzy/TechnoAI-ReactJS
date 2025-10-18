@@ -139,9 +139,12 @@ function Register(props) {
         });
     };
 
+    // ✅ Updated: dynamically use API base URL
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     const registerUserInDB = async (userData) => {
         try {
-            const response = await fetch('http://localhost:5000/api/auth/register', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -179,35 +182,30 @@ function Register(props) {
                 agreed_to_terms: true
             };
 
-            // Register user in MongoDB
             const result = await registerUserInDB(signupData);
 
             if (result.success) {
                 console.log('Google registration successful:', result);
-                
-                // Show success message with countdown timer
                 await showSuccessAlert();
             }
         } catch (error) {
             console.error("Google registration failed:", error);
-            
-            // Check if it's an existing user error
+
             if (error.message && error.message.includes('already registered with email/password')) {
                 await showErrorAlert(
-                    '⚠️ Account Conflict', 
+                    '⚠️ Account Conflict',
                     'This email is already registered with email/password. Please use email login instead.',
                     'warning'
                 );
             } else if (error.message && error.message.includes('must agree to the Terms')) {
-                // Only show agreement error for new registrations
                 await showErrorAlert(
-                    '⚠️ Agreement Required', 
+                    '⚠️ Agreement Required',
                     'You must agree to the Terms of Service and Privacy Policy to register.',
                     'warning'
                 );
             } else {
                 await showErrorAlert(
-                    '❌ Registration Failed', 
+                    '❌ Registration Failed',
                     error.message || 'Google registration failed. Please try again.'
                 );
             }
@@ -219,7 +217,7 @@ function Register(props) {
     const handleGoogleError = () => {
         console.error("Google Signup Failed");
         showErrorAlert(
-            '❌ Google Signup Failed', 
+            '❌ Google Signup Failed',
             'Google signup failed. Please try again.'
         );
     };
@@ -250,10 +248,10 @@ function Register(props) {
 
     const handleRegularSignup = async (e) => {
         e.preventDefault();
-        
+
         if (!validateAgreement()) {
             await showErrorAlert(
-                '⚠️ Agreement Required', 
+                '⚠️ Agreement Required',
                 'You must agree to the Terms of Service and Privacy Policy to continue.',
                 'warning'
             );
@@ -261,14 +259,14 @@ function Register(props) {
         }
 
         setIsLoading(true);
-        
+
         const formData = new FormData(e.target);
         const password = formData.get('password');
         const confirmPassword = formData.get('confirmPassword');
 
         if (password !== confirmPassword) {
             await showErrorAlert(
-                '🔒 Password Mismatch', 
+                '🔒 Password Mismatch',
                 'Passwords do not match. Please make sure both passwords are identical.',
                 'warning'
             );
@@ -278,7 +276,7 @@ function Register(props) {
 
         if (password.length < 6) {
             await showErrorAlert(
-                '🔒 Password Too Short', 
+                '🔒 Password Too Short',
                 'Password must be at least 6 characters long for security.',
                 'warning'
             );
@@ -295,28 +293,19 @@ function Register(props) {
         };
 
         try {
-            // Register user in MongoDB
             const result = await registerUserInDB(userData);
 
             if (result.success) {
                 console.log('Email registration successful:', result);
-                
-                // Show success message with countdown timer
                 await showSuccessAlert();
             }
         } catch (error) {
             console.error("Registration failed:", error);
-            
-            // Handle specific error cases
             let errorMessage = error.message || 'Registration failed. Please try again.';
             if (errorMessage.includes('already exists') || errorMessage.includes('duplicate')) {
                 errorMessage = 'An account with this email already exists. Please try logging in or use a different email.';
             }
-            
-            await showErrorAlert(
-                '❌ Registration Failed', 
-                errorMessage
-            );
+            await showErrorAlert('❌ Registration Failed', errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -490,12 +479,10 @@ function Register(props) {
                 </form>
             </div>
 
-            {/* Terms of Service Modal */}
             {showTermsModal && (
                 <TermsOfService onClose={() => setShowTermsModal(false)} />
             )}
 
-            {/* Privacy Policy Modal */}
             {showPrivacyModal && (
                 <PrivacyPolicy onClose={() => setShowPrivacyModal(false)} />
             )}
