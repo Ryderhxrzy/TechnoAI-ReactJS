@@ -790,7 +790,9 @@ function Home({ onLogout }) {
 
   // Send message to Gemini API
   const sendToGemini = async (userMessage) => {
-    const apiKey = import.meta.env.VITE_APP_GEMINI_API_KEY;
+    /*const apiKey = import.meta.env.VITE_APP_GEMINI_API_KEY;*/
+    const apiKey = process.env.VITE_APP_GEMINI_API_KEY;
+
     
     if (!apiKey) {
       throw new Error("API key not configured");
