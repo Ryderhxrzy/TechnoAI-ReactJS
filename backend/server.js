@@ -5,6 +5,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import messageRoutes from "./routes/messages.js";
+import aiRoutes from "./routes/ai.js";
 
 /* Load environment variables from the root directory
 dotenv.config({ path: '../.env' });*/
@@ -48,7 +49,7 @@ mongoose
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
-
+app.use("/api/ai", aiRoutes);
 // ✅ Test route
 app.get("/", (req, res) => {
   res.send("API is working 🚀");

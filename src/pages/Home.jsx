@@ -790,68 +790,32 @@ function Home({ onLogout }) {
 
   // Send message to Gemini API
   const sendToGemini = async (userMessage) => {
-    /*const apiKey = import.meta.env.VITE_APP_GEMINI_API_KEY;*/
-    const apiKey = process.env.VITE_APP_GEMINI_API_KEY;
-
-    
-    if (!apiKey) {
-      throw new Error("API key not configured");
-    }
-
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-
-    // Enhance the prompt for step-by-step responses
-    const enhancedMessage = enhancePromptForSteps(userMessage, firstName);
-
-    const requestBody = {
-      contents: [
-        {
-          parts: [
-            {
-              text: enhancedMessage
-            }
-          ]
-        }
-      ],
-      generationConfig: {
-        maxOutputTokens: 5000, // Increased for more detailed step-by-step responses
-        temperature: 0.7,
-      }
-    };
-
     try {
-      const response = await fetch(url, {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+      
+      console.log('Sending message to backend:', userMessage);
+      
+      const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-goog-api-key': apiKey
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify({ 
+          message: userMessage 
+        })
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API Error Response:', errorData);
-        
-        if (response.status === 404) {
-          return tryAlternativeModels(enhancedMessage, apiKey);
-        } else if (response.status === 400) {
-          throw new Error(`Bad request: ${errorData.error?.message || 'Invalid request format'}`);
-        } else if (response.status === 403) {
-          throw new Error(`API key invalid or permission denied`);
-        } else if (response.status === 429) {
-          throw new Error(`Rate limit exceeded. Please try again later.`);
-        } else {
-          throw new Error(`HTTP ${response.status}: ${errorData.error?.message || 'API request failed'}`);
-        }
-      }
-
+  
       const data = await response.json();
       
-      if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-        return data.candidates[0].content.parts[0].text;
+      if (!response.ok) {
+        console.error('Backend API error:', data);
+        throw new Error(data.error || `HTTP ${response.status}: API request failed`);
+      }
+  
+      if (data.success && data.response) {
+        return data.response;
       } else {
-        throw new Error("Unexpected API response format");
+        throw new Error(data.error || "Unexpected response format from backend");
       }
       
     } catch (error) {
