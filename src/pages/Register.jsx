@@ -31,7 +31,11 @@ function Register(props) {
         setTheme(savedTheme);
         document.documentElement.setAttribute("data-theme", savedTheme);
     }, []);
-
+    useEffect(() => {
+        console.log('=== DOMAIN VERIFICATION ===');
+        console.log('Current domain for Google OAuth:', window.location.origin);
+        console.log('Should match:', 'https://techno-ai-react-6g8g9404c-ryder-hxrzys-projects.vercel.app');
+      }, []);
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem("theme", theme);
