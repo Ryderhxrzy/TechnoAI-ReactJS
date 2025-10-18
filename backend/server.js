@@ -3,10 +3,10 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import authRoutes from "routes/auth.js";
-import messageRoutes from "routes/messages.js";
-import aiRoutes from "routes/ai.js";
-import healthRoutes from "routes/health.js";
+import authRoutes from "./routes/auth.js";
+import messageRoutes from "./routes/messages.js";
+import aiRoutes from "./routes/ai.js";
+import healthRoutes from "./routes/health.js";
 
 /* Load environment variables from the root directory
 dotenv.config({ path: '../.env' });*/
