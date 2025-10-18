@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp -r dist ../backend/dist",
+    "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "cd backend && node server.js"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -18,7 +17,8 @@
     "prismjs": "^1.30.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "sweetalert2": "^11.23.0"
+    "sweetalert2": "^11.23.0",
+    "technoai-reactjs": "file:"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -33,3 +33,4 @@
     "vite": "^7.1.7"
   }
 }
+
