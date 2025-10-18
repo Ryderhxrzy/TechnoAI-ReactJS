@@ -1259,6 +1259,22 @@ function Home({ onLogout }) {
     }
   }, [message]);
 
+  // Add click outside handler for chat menu dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.chat-menu')) {
+        document.querySelectorAll('.chat-menu-dropdown').forEach(dropdown => {
+          dropdown.classList.remove('show');
+        });
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   const startNewChat = () => {
     setChatMessages([]);
     setIsTyping(false);
@@ -1271,11 +1287,216 @@ function Home({ onLogout }) {
     copyToClipboard(text);
   };
 
+  // Function to handle copy response button clicks
+  const handleCopyResponse = (text) => {
+    if (text) {
+      copyToClipboard(text);
+      // Show success feedback
+      Swal.fire({
+        title: 'Copied!',
+        text: 'Response copied to clipboard',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
+    }
+  };
+
   // Handle conversation title click
   const handleConversationClick = (title) => {
     console.log('Loading conversation:', title);
     setCurrentChatTitle(title);
     loadChatMessages(title);
+  };
+
+  // Handle chat menu click
+  const handleChatMenuClick = (title, event) => {
+    // Close all other dropdowns first
+    document.querySelectorAll('.chat-menu-dropdown').forEach(dropdown => {
+      if (dropdown.id !== event.target.closest('.chat-menu').querySelector('.chat-menu-dropdown').id) {
+        dropdown.classList.remove('show');
+      }
+    });
+    
+    // Toggle current dropdown
+    const dropdown = event.target.closest('.chat-menu').querySelector('.chat-menu-dropdown');
+    dropdown.classList.toggle('show');
+  };
+
+  // Handle edit chat title - inline editing
+  const handleEditChatTitle = (currentTitle) => {
+    // Close the dropdown menu
+    document.querySelectorAll('.chat-menu-dropdown').forEach(dropdown => {
+      dropdown.classList.remove('show');
+    });
+    
+    // Find the chat item and make title editable
+    const chatItems = document.querySelectorAll('.chat-item');
+    chatItems.forEach(item => {
+      const titleElement = item.querySelector('.chat-title');
+      if (titleElement && titleElement.textContent === currentTitle) {
+        // Create input element
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentTitle;
+        input.className = 'chat-title-edit';
+        input.maxLength = 50;
+        
+        // Replace title with input
+        titleElement.style.display = 'none';
+        titleElement.parentNode.insertBefore(input, titleElement);
+        input.focus();
+        input.select();
+        
+        // Handle save on Enter or blur
+        const saveTitle = async () => {
+          const newTitle = input.value.trim();
+          if (newTitle && newTitle !== currentTitle && newTitle.length <= 50) {
+            try {
+              // Update in database
+              const response = await fetch(`http://localhost:5000/api/messages/update-title/${encodeURIComponent(userId)}/${encodeURIComponent(currentTitle)}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ newTitle: newTitle })
+              });
+              
+              if (response.ok) {
+                // Update local state
+                setConversationTitles(prev => 
+                  prev.map(conv => 
+                    conv.title === currentTitle 
+                      ? { ...conv, title: newTitle }
+                      : conv
+                  )
+                );
+                
+                // Update current chat title if it's the active one
+                if (currentChatTitle === currentTitle) {
+                  setCurrentChatTitle(newTitle);
+                }
+                
+                // Show success message
+                Swal.fire({
+                  title: 'Success!',
+                  text: 'Chat title updated successfully',
+                  icon: 'success',
+                  timer: 1500,
+                  showConfirmButton: false,
+                  toast: true,
+                  position: 'top-end'
+                });
+              } else {
+                throw new Error('Failed to update title');
+              }
+            } catch (error) {
+              console.error('Error updating chat title:', error);
+              Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update chat title',
+                icon: 'error',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+              });
+            }
+          }
+          
+          // Restore title element
+          titleElement.textContent = newTitle || currentTitle;
+          titleElement.style.display = 'block';
+          input.remove();
+        };
+        
+        // Handle cancel on Escape
+        const cancelEdit = () => {
+          titleElement.style.display = 'block';
+          input.remove();
+        };
+        
+        input.addEventListener('blur', saveTitle);
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            saveTitle();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelEdit();
+          }
+        });
+      }
+    });
+  };
+
+  // Handle delete conversation
+  const handleDeleteConversation = (title) => {
+    Swal.fire({
+      title: 'Delete Conversation',
+      text: `Are you sure you want to delete "${title}"? This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Delete conversation from database
+          const response = await fetch(`http://localhost:5000/api/messages/delete-conversation/${encodeURIComponent(userId)}/${encodeURIComponent(title)}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+          
+          if (response.ok) {
+            // Update local state - remove from conversation list
+            setConversationTitles(prev => 
+              prev.filter(conv => conv.title !== title)
+            );
+            
+            // If this was the active conversation, start a new chat
+            if (currentChatTitle === title) {
+              setChatMessages([]);
+              setCurrentChatTitle("New Chat " + new Date().toLocaleDateString());
+            }
+            
+            // Close dropdown menu
+            document.querySelectorAll('.chat-menu-dropdown').forEach(dropdown => {
+              dropdown.classList.remove('show');
+            });
+            
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'Conversation has been deleted.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top-end'
+            });
+          } else {
+            throw new Error('Failed to delete conversation');
+          }
+        } catch (error) {
+          console.error('Error deleting conversation:', error);
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to delete conversation',
+            icon: 'error',
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+          });
+        }
+      }
+    });
   };
 
   // Update chat title based on first message
@@ -1325,12 +1546,43 @@ function Home({ onLogout }) {
                 <div 
                   key={index}
                   className={`chat-item ${conversation.title === currentChatTitle ? 'active' : ''}`}
-                  onClick={() => handleConversationClick(conversation.title)}
                 >
-                  <div className="chat-title">{conversation.title}</div>
-                  <div className="chat-preview">Click to view conversation</div>
-                  <div className="chat-time">
-                    {new Date(conversation.lastMessage).toLocaleDateString()}
+                  <div 
+                    className="chat-content"
+                    onClick={() => handleConversationClick(conversation.title)}
+                  >
+                    <div className="chat-title">{conversation.title}</div>
+                    <div className="chat-preview">Click to view conversation</div>
+                    <div className="chat-time">
+                      {new Date(conversation.lastMessage).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <div className="chat-menu">
+                    <button 
+                      className="chat-menu-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleChatMenuClick(conversation.title, e);
+                      }}
+                    >
+                      <i className="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div className="chat-menu-dropdown" id={`menu-${index}`}>
+                      <button 
+                        className="menu-item edit-item"
+                        onClick={() => handleEditChatTitle(conversation.title)}
+                      >
+                        <i className="fas fa-edit"></i>
+                        Edit Title
+                      </button>
+                      <button 
+                        className="menu-item delete-item"
+                        onClick={() => handleDeleteConversation(conversation.title)}
+                      >
+                        <i className="fas fa-trash"></i>
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1450,12 +1702,7 @@ function Home({ onLogout }) {
                   ? "I'm here to help you with step-by-step solutions, coding guidance, and detailed explanations. Ask me anything and I'll break it down for you!"
                   : "Please configure your Gemini API key to start chatting."}
               </p>
-              {isSpeechSupported && (
-                <div className="voice-feature-info">
-                  <i className="fas fa-microphone"></i>
-                  <span>Try voice input by clicking the microphone button!</span>
-                </div>
-              )}
+              
             </div>
           ) : (
             <div className="messages-container">
@@ -1473,20 +1720,53 @@ function Home({ onLogout }) {
                   className={`message ${msg.sender}-message ${msg.isError ? 'error-message' : ''}`}
                 >
                   {msg.sender === "bot" && msg.formattedText ? (
-                    <div 
-                      dangerouslySetInnerHTML={{ __html: msg.formattedText }}
-                      onClick={(e) => {
-                        // Handle copy button clicks within the formatted text
-                        if (e.target.classList.contains('copy-btn')) {
-                          const copyText = e.target.getAttribute('data-copy-text');
-                          if (copyText) {
-                            handleCopyClick(copyText);
+                    <div className="bot-message-content">
+                      <div 
+                        dangerouslySetInnerHTML={{ __html: msg.formattedText }}
+                        onClick={(e) => {
+                          // Handle copy button clicks within the formatted text
+                          if (e.target.classList.contains('copy-btn')) {
+                            const copyText = e.target.getAttribute('data-copy-text');
+                            if (copyText) {
+                              handleCopyClick(copyText);
+                            }
                           }
-                        }
-                      }}
-                    />
+                        }}
+                      />
+                      <div className="bot-message-actions">
+                        <button 
+                          className="msg-action-btn msg-copy-btn" 
+                          title="Copy response"
+                          onClick={() => {
+                            handleCopyResponse(msg.text);
+                          }}
+                        >
+                          <i className="fas fa-copy"></i>
+                        </button>
+                        <button 
+                          className="msg-action-btn msg-like-btn" 
+                          title="Like response"
+                          onClick={() => {
+                            // Like functionality will be added later
+                            console.log('Like clicked for bot message:', msg.id);
+                          }}
+                        >
+                          <i className="fas fa-thumbs-up"></i>
+                        </button>
+                        <button 
+                          className="msg-action-btn msg-unlike-btn" 
+                          title="Unlike response"
+                          onClick={() => {
+                            // Unlike functionality will be added later
+                            console.log('Unlike clicked for bot message:', msg.id);
+                          }}
+                        >
+                          <i className="fas fa-thumbs-down"></i>
+                        </button>
+                      </div>
+                    </div>
                   ) : (
-                      <div>{msg.text || 'No content'}</div>
+                      <div className="user-message-text">{msg.text || 'No content'}</div>
                   )}
                 </div>
                 );
