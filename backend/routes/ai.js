@@ -1,5 +1,5 @@
-// backend/routes/ai.js or similar
-const express = require('express');
+// backend/routes/ai.js - FIXED VERSION
+import express from 'express';
 const router = express.Router();
 
 router.post('/chat', async (req, res) => {
