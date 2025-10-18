@@ -17,9 +17,9 @@ const app = express();
 
 // ✅ CORS Configuration
 const allowedOrigins = [
+  "http://localhost:5173",
   "https://techno-ai-react-js.vercel.app",
   "https://techno-ai-react-js-ryder-hxrzys-projects.vercel.app",
-  "http://localhost:5173",
 ];
 
 app.use(
