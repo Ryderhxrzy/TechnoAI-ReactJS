@@ -1007,7 +1007,7 @@ function Home({ onLogout }) {
     
     // Redirect to login.php after a short delay
     setTimeout(() => {
-      window.location.href = "login.php";
+      window.location.href = "/";
     }, 500);
   };
 
