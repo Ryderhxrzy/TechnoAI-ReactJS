@@ -20,6 +20,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://techno-ai-react-js.vercel.app",
   "https://techno-ai-react-js-ryder-hxrzys-projects.vercel.app",
+  "techno-ai-react-hpnrf02gn-ryder-hxrzys-projects.vercel.app"
 ];
 
 app.use(
