@@ -25,9 +25,13 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.log('CORS blocked for origin:', origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
@@ -53,11 +57,29 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/health", healthRoutes);
-// ✅ Test route
+
+// ✅ Test route - FIXED
 app.get("/", (req, res) => {
-  res.send("API is working 🚀");
+  res.json({ 
+    message: "API is working 🚀",
+    timestamp: new Date().toISOString(),
+    port: process.env.PORT
+  });
 });
 
-// ✅ Server Listen
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ✅ Health check route
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'Backend is running',
+    timestamp: new Date().toISOString(),
+    port: process.env.PORT
+  });
+});
+
+// ✅ Server Listen - FIXED
+const PORT = process.env.PORT || 10000; // ✅ Change to 10000 to match Render
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
