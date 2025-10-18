@@ -760,30 +760,6 @@ function Home({ onLogout }) {
   };
 
   const checkApiKey = () => {
-    const apiKey = import.meta.env.VITE_APP_GEMINI_API_KEY;
-    
-    if (!apiKey) {
-      setApiStatus("unavailable");
-      Swal.fire({
-        title: 'API Key Missing',
-        text: 'Gemini API key is not configured in .env file',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      return false;
-    }
-
-    if (!apiKey.startsWith('AIza')) {
-      setApiStatus("unavailable");
-      Swal.fire({
-        title: 'Invalid API Key Format',
-        text: 'API key should start with "AIza"',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
-      return false;
-    }
-
     setApiStatus("available");
     return true;
   };
