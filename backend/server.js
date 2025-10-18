@@ -6,7 +6,10 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import messageRoutes from "./routes/messages.js";
 
-dotenv.config({ path: '../.env' });
+/* Load environment variables from the root directory
+dotenv.config({ path: '../.env' });*/
+
+dotenv.config();
 
 const app = express();
 
