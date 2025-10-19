@@ -190,3 +190,25 @@
     color: var(--button-text-color);
   }
 }
+
+/* Responsive base: fluid type, media, containers */
+html {
+  font-size: clamp(14px, 1.2vw, 16px);
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Optional utility container */
+.container {
+  width: min(100% - 2rem, 1200px);
+  margin-inline: auto;
+}
+
+/* Respect mobile safe areas */
+body {
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}

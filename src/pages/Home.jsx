@@ -1653,6 +1653,14 @@ function Home({ onLogout }) {
         </div>
       </div>
 
+      {/* Mobile overlay to close sidebar */}
+      <div
+        className="sidebar-overlay"
+        onClick={() => setSidebarOpen(false)}
+        role="button"
+        aria-label="Close sidebar"
+      />
+
       {/* Chat Container */}
       <div className="chat-container">
         {/* Chat Header */}

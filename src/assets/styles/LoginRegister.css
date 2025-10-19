@@ -7,14 +7,13 @@ body {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: clamp(12px, 3vw, 20px);
             line-height: 1.5;
         }
 
         /* Login Container */
         .login-container {
-            width: 700px;
-            max-width: 400px;
+            width: min(100%, 400px);
             background: var(--bg-elevated);
             border-radius: 16px;
             border: 1px solid var(--border-primary);
@@ -188,7 +187,7 @@ body {
 
         /* Form */
         .login-form {
-            padding: 0 32px 32px;
+            padding: 0 clamp(20px, 4vw, 32px) clamp(20px, 4vw, 32px);
         }
 
         .form-group {
