@@ -910,16 +910,30 @@ function Home({ onLogout }) {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  // Watch screen resize
+  // Watch screen resize and handle viewport height
   useEffect(() => {
     function handleResize() {
       if (window.innerWidth <= 768) {
         setSidebarCollapsed(false);
       }
+      
+      // Update CSS custom property for viewport height
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
+    
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+    
+    // Initial viewport height calculation
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
   }, []);
 
   // Close logout dropdown when clicking outside

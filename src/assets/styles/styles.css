@@ -1,4 +1,11 @@
-/* CSS Custom Properties for Light and Dark Themes *//* Base Styles */
+/* CSS Custom Properties for Light and Dark Themes */
+:root {
+  --vh: 1vh;
+  --header-height: 60px;
+  --input-height: 80px;
+}
+
+/* Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -21,14 +28,16 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: var(--bg-secondary);
-  overflow: auto;
   min-height: 100vh;
-  height: 100dvh; /* Dynamic viewport height for mobile */
+  min-height: calc(var(--vh, 1vh) * 100);
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   overflow: hidden;
   color: var(--text-primary);
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -84,12 +93,13 @@ body.landing-page {
   display: flex;
   width: 100vw;
   height: 100vh;
-  height: 100dvh; /* Dynamic viewport height for mobile */
+  height: calc(var(--vh, 1vh) * 100);
   margin: 0;
   padding: 0;
   background: var(--bg-primary);
   position: fixed;
   inset: 0;
+  overflow: hidden;
 }
 
 /* Logo Styles */
@@ -868,6 +878,9 @@ body.landing-page {
   position: relative;
   min-width: 0; /* Prevent flex item from overflowing */
   width: 100%;
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  overflow: hidden;
 }
 
 .header-actions {
@@ -903,6 +916,8 @@ body.landing-page {
   flex-direction: column;
   gap: 16px;
   min-height: 0;
+  max-height: calc(100vh - 140px); /* Account for header and input */
+  max-height: calc(calc(var(--vh, 1vh) * 100) - 140px);
 }
 
 .messages-container {
@@ -1452,6 +1467,14 @@ body.landing-page {
   box-sizing: border-box;
   position: relative;
   flex-shrink: 0;
+  border-top: 1px solid var(--border-primary);
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  /* Ensure input stays at bottom */
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
 
 .input-wrapper {
@@ -1714,6 +1737,7 @@ body.landing-page {
   #app-container {
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
   }
   /* Sidebar styles */
@@ -1777,8 +1801,10 @@ body.landing-page {
   .chat-container {
     width: 100%;
     height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   /* Chat Header Responsive */
@@ -1795,6 +1821,8 @@ body.landing-page {
     padding: 16px 12px;
     flex: 1;
     overflow-y: auto;
+    max-height: calc(100vh - 120px);
+    max-height: calc(calc(var(--vh, 1vh) * 100) - 120px);
   }
 
   /* Message Responsive Adjustments */
@@ -1839,6 +1867,9 @@ body.landing-page {
   /* Input Container Responsive */
   .input-container {
     padding: 12px 16px;
+    position: sticky;
+    bottom: 0;
+    min-height: 70px;
   }
 
   .input-wrapper {
@@ -1886,9 +1917,18 @@ body.landing-page {
 
 /* Small device layout refinements */
 @media (max-width: 480px) {
-  #chat-box { padding: 16px; }
+  #chat-box { 
+    padding: 16px; 
+    max-height: calc(100vh - 110px);
+    max-height: calc(calc(var(--vh, 1vh) * 100) - 110px);
+  }
   .user-message { max-width: 90%; }
   .bot-message, .typing-indicator { margin-left: 44px; max-width: calc(92% - 44px); }
+  
+  .input-container {
+    padding: 8px 12px;
+    min-height: 60px;
+  }
 }
 
 /* Desktop view - completely hide minimizer */
@@ -1909,6 +1949,38 @@ body.landing-page {
   }
 
   .message { max-width: min(80%, 720px); }
+}
+
+/* Additional responsive improvements */
+@media (max-height: 600px) {
+  /* For devices with smaller heights */
+  #chat-box {
+    max-height: calc(100vh - 100px);
+    max-height: calc(calc(var(--vh, 1vh) * 100) - 100px);
+  }
+  
+  .input-container {
+    padding: 8px 16px;
+    min-height: 60px;
+  }
+  
+  .input-wrapper {
+    min-height: 50px;
+    padding: 8px 8px 40px 8px;
+  }
+}
+
+@media (max-height: 500px) {
+  /* For very small height devices */
+  #chat-box {
+    max-height: calc(100vh - 80px);
+    max-height: calc(calc(var(--vh, 1vh) * 100) - 80px);
+  }
+  
+  .chat-header {
+    padding: 8px 16px;
+    min-height: 50px;
+  }
 }
 
 /* Small devices improvements */
