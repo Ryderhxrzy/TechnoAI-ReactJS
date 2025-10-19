@@ -5,6 +5,18 @@
   box-sizing: border-box;
 }
 
+/* Global smooth transitions for theme switching */
+*,
+*::before,
+*::after {
+  transition: 
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    opacity 0.3s ease;
+}
+
 @supports (-webkit-touch-callout: none) {
   /* iOS Safari specific fixes */
   body {
@@ -31,7 +43,7 @@ body {
   height: 100dvh; /* Dynamic viewport height for mobile */
   overflow: hidden;
   color: var(--text-primary);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Landing page specific body styles */
@@ -90,6 +102,7 @@ body.landing-page {
   background: var(--bg-primary);
   position: fixed;
   inset: 0;
+  transition: background-color 0.3s ease;
 }
 
 /* Logo Styles */
@@ -2000,7 +2013,9 @@ textarea:focus-visible {
 
 /* Improved contrast for better accessibility */
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -2023,7 +2038,35 @@ textarea:focus-visible {
 
 /* Add smooth transitions for all interactive elements */
 button, input[type="text"], textarea, .chat-item, .action-btn {
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+}
+
+/* Specific transitions for theme-sensitive elements */
+.sidebar,
+.chat-container,
+.input-container,
+.input-wrapper,
+.message,
+.code-block,
+.chat-header,
+#chat-box,
+.user-message,
+.bot-message,
+.typing-indicator,
+.chat-item,
+.profile-avatar,
+.new-chat-btn,
+.action-btn {
+  transition: 
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Text elements smooth transitions */
+h1, h2, h3, h4, h5, h6, p, span, div, label {
+  transition: color 0.3s ease;
 }
 
 .response-header {
