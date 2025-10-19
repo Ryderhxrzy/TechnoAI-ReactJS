@@ -946,9 +946,26 @@ function Home({ onLogout }) {
   // Toggle theme
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
+    
+    // Add a class to force immediate updates during theme change
+    document.documentElement.classList.add('theme-changing');
+    
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
+    
+    // Remove the class after a short delay
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-changing');
+    }, 150);
   };
+  
+  // Also update your useEffect for theme application:
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    
+    // Force a reflow to ensure smooth transition
+    document.body.clientWidth;
+  }, [theme]);
 
   // Toggle sidebar
   const toggleSidebar = () => {

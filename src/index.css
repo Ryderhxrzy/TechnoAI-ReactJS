@@ -191,6 +191,82 @@
   }
 }
 
+* {
+  transition: background-color 0.2s ease, 
+              color 0.2s ease, 
+              border-color 0.2s ease,
+              box-shadow 0.2s ease,
+              fill 0.2s ease,
+              stroke 0.2s ease !important;
+}
+
+/* Faster transitions for interactive elements */
+button, 
+input, 
+textarea, 
+select,
+.sidebar-minimizer,
+.header-minimizer,
+.action-btn,
+#send-btn,
+#mic-btn,
+.copy-btn {
+  transition: all 0.15s ease !important;
+}
+
+/* Immediate transitions for critical containers */
+#app-container,
+.chat-container,
+#chat-box,
+.sidebar,
+.chat-header,
+.input-container,
+.input-wrapper {
+  transition: background-color 0.15s ease, 
+              color 0.15s ease, 
+              border-color 0.15s ease !important;
+}
+
+/* No transition for performance-critical elements */
+.typing-indicator,
+.typing-dots,
+.messages-container,
+.message {
+  transition: none !important;
+}
+
+/* Profile section fixes for dark mode */
+[data-theme="dark"] .user-profile {
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border-primary);
+}
+
+[data-theme="dark"] .profile-avatar {
+  background: var(--accent-primary);
+  color: var(--profile-avatar-color) !important;
+}
+
+/* Button fixes for dark mode */
+[data-theme="dark"] .new-chat-btn,
+[data-theme="dark"] .action-btn,
+[data-theme="dark"] #send-btn,
+[data-theme="dark"] .header-minimizer,
+[data-theme="dark"] .sidebar-minimizer,
+[data-theme="dark"] .mobile-menu-btn {
+  color: var(--button-text-color) !important;
+}
+
+[data-theme="dark"] .new-chat-btn i,
+[data-theme="dark"] .sidebar-minimizer i,
+[data-theme="dark"] .mobile-menu-btn i {
+  color: var(--button-text-color) !important;
+}
+
+/* Ensure white text in buttons for dark mode */
+[data-theme="dark"] button {
+  color: var(--button-text-color);
+}
+
 /* Responsive base: fluid type, media, containers */
 html {
   font-size: clamp(14px, 1.2vw, 16px);
@@ -207,23 +283,72 @@ img, video {
   margin-inline: auto;
 }
 
-/* Apply transitions to specific properties that change with theme */
-[data-theme] {
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* CHAT CONTAINER SPECIFIC FIXES */
+.chat-container {
+  background: var(--bg-secondary) !important;
+  transition: background-color 0.15s ease !important;
 }
 
+#chat-box {
+  background: var(--bg-secondary) !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.messages-container {
+  transition: none !important;
+}
+
+/* Input area specific transitions */
+.input-container {
+  background: var(--bg-secondary) !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.input-wrapper {
+  background: var(--bg-input) !important;
+  border-color: var(--border-primary) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+/* Sidebar specific transitions */
+.sidebar {
+  background: var(--bg-elevated) !important;
+  border-color: var(--border-primary) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+/* Message specific styling with quick transitions */
+.user-message {
+  background: var(--bg-input) !important;
+  border-color: var(--border-primary) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.bot-message {
+  background: transparent !important;
+  transition: none !important;
+}
+
+/* Code block transitions */
+.code-block {
+  background: var(--code-bg) !important;
+  border-color: var(--code-border) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.code-header {
+  background: var(--code-header-bg) !important;
+  color: var(--code-header-text) !important;
+  border-color: var(--code-border) !important;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+}
+
+/* Override any delayed transitions */
 [data-theme] * {
-  transition: background-color 0.3s ease, 
-              color 0.3s ease, 
-              border-color 0.3s ease,
-              box-shadow 0.3s ease;
+  transition-duration: 0.15s !important;
 }
 
-/* Exclude interactive elements from the long transition */
-[data-theme] button,
-[data-theme] input,
-[data-theme] textarea,
-[data-theme] .sidebar-minimizer,
-[data-theme] .header-minimizer {
-  transition: all 0.2s ease !important;
+/* Force immediate updates for theme change */
+.theme-changing {
+  transition: none !important;
 }

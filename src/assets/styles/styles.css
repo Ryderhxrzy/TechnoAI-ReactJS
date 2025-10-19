@@ -1594,10 +1594,11 @@ body.landing-page {
   transition: height 0.2s ease-out;
 }
 
-/* Ensure proper vertical alignment */
+/* Ensure proper vertical alignment and left alignment for all placeholders */
 #user-input::placeholder {
   color: var(--text-muted);
   opacity: 0.7;
+  text-align: left;
 }
 
 /* Focus states */
@@ -1691,6 +1692,7 @@ body.landing-page {
 
   .chat-container:not(.has-messages) #user-input::placeholder {
     font-size: 14px;
+    text-align: left;
   }
 }
 
@@ -1699,21 +1701,21 @@ body.landing-page {
   display: none; /* Completely hidden */
 }
 
-/* Centered input styling improvements */
+/* Consistent input styling for both states */
 .chat-container:not(.has-messages) .input-wrapper {
-  border: 2px solid var(--border-primary);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+  background: var(--bg-input);
 }
 
 .chat-container:not(.has-messages) .input-wrapper:focus-within {
   border-color: var(--accent-primary);
-  box-shadow: 0 4px 24px rgba(16, 163, 127, 0.2);
+  box-shadow: 0 2px 12px rgba(16, 163, 127, 0.15);
 }
 
-/* Cursor-like placeholder styling for centered state */
+/* Left-aligned placeholder for all states */
 .chat-container:not(.has-messages) #user-input::placeholder {
-  text-align: center;
+  text-align: left;
   font-size: 16px;
   color: var(--text-muted);
   opacity: 0.8;
@@ -2153,6 +2155,7 @@ button, input[type="text"], textarea, .chat-item, .action-btn {
 .user-name {
   font-weight: 600;
   color: var(--accent-primary);
+  font-style: italic;
   opacity: 0.9;
   transition: all 0.3s ease;
 }
