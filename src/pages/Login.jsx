@@ -15,6 +15,7 @@ function Login(props) {
     const [showPassword, setShowPassword] = useState(false);
     const [currentPage, setCurrentPage] = useState('login');
     const [isLoading, setIsLoading] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
     const passwordRef = useRef(null);
     const emailRef = useRef(null);
@@ -69,7 +70,7 @@ function Login(props) {
     // ✅ GOOGLE LOGIN HANDLER
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
-            setIsLoading(true);
+            setIsGoogleLoading(true);
             const token = credentialResponse.credential;
             const user = jwtDecode(token);
             console.log("Google User:", user);
@@ -94,7 +95,7 @@ function Login(props) {
             console.error("Google login error:", error);
             showCustomAlert('error', 'Error', 'Something went wrong during Google login');
         } finally {
-            setIsLoading(false);
+            setIsGoogleLoading(false);
         }
     };
 
@@ -171,7 +172,15 @@ function Login(props) {
                             onError={handleGoogleError}
                             theme={theme === "dark" ? "filled_black" : "outline"}
                             size="large"
+                            text="continue_with"
+                            shape="rectangular"
+                            width="100%"
                         />
+                        {isGoogleLoading && (
+                            <div className="loading-overlay">
+                                <div className="spinner-small"></div>
+                            </div>
+                        )}
                     </div>
                     
                     <div className="divider"><span>or</span></div>
@@ -186,6 +195,7 @@ function Login(props) {
                             className="form-input" 
                             placeholder='Enter your email' 
                             required
+                            disabled={isLoading}
                         />
                     </div>
 
@@ -201,12 +211,14 @@ function Login(props) {
                                 placeholder='Enter your password' 
                                 required
                                 minLength="6"
+                                disabled={isLoading}
                             />
                             <button 
                                 type="button" 
                                 onClick={togglePassword} 
                                 className="password-toggle" 
                                 aria-label='Toggle password visibility'
+                                disabled={isLoading}
                             >
                                 <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"} id="password-icon"></i>
                             </button>
@@ -215,15 +227,34 @@ function Login(props) {
 
                     <div className="form-options">
                         <label htmlFor="remember" className="remember-me">
-                            <input type="checkbox" name="remember" id="remember" />
+                            <input 
+                                type="checkbox" 
+                                name="remember" 
+                                id="remember" 
+                                disabled={isLoading}
+                            />
                             Remember Me
                         </label>
                         <a href="#" className='forgot-password'>Forgot password?</a>
                     </div>
 
-                    <button type="submit" className="btn btn-primary" id="login-btn" disabled={isLoading}>
-                        <i className="fas fa-sign-in-alt"></i>
-                        {isLoading ? 'Signing in...' : 'Sign in'}
+                    <button 
+                        type="submit" 
+                        className={`btn btn-primary ${isLoading ? 'loading' : ''}`}
+                        id="login-btn" 
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <div className="button-spinner"></div>
+                                Signing in...
+                            </>
+                        ) : (
+                            <>
+                                <i className="fas fa-sign-in-alt"></i>
+                                Sign in
+                            </>
+                        )}
                     </button>
 
                     <div className="register-link">
@@ -232,6 +263,7 @@ function Login(props) {
                                 type="button" 
                                 className="link-button"
                                 onClick={props.onNavigateToRegister}
+                                disabled={isLoading}
                             >
                                 Create account
                             </button>
