@@ -7,6 +7,7 @@ function LandingPage({ onNavigateToLogin, onNavigateToRegister }) {
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem("theme") || "light";
     });
+    const [navOpen, setNavOpen] = useState(false);
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
@@ -23,6 +24,9 @@ function LandingPage({ onNavigateToLogin, onNavigateToRegister }) {
         localStorage.setItem("theme", newTheme);
     };
 
+    const closeNav = () => setNavOpen(false);
+    const toggleNav = () => setNavOpen((prev) => !prev);
+
     const scrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
         if (element) {
@@ -38,26 +42,37 @@ function LandingPage({ onNavigateToLogin, onNavigateToRegister }) {
             </button>
 
             {/* Navigation */}
-            <nav className="landing-nav">
+            <nav className="landing-nav" role="navigation" aria-label="Main">
                 <div className="nav-container">
                     <div className="nav-logo">
                         <img src={logo} alt="TechnoAI Logo" className="nav-logo-img" />
                         <span className="nav-logo-text">Techno.ai</span>
                     </div>
-                    <div className="nav-menu">
-                        <button className="nav-link" onClick={() => scrollToSection('features')}>
+                    {/* Mobile nav toggle */}
+                    <button
+                        className="nav-toggle"
+                        aria-controls="primary-navigation"
+                        aria-expanded={navOpen}
+                        onClick={toggleNav}
+                    >
+                        <i className={navOpen ? "fas fa-times" : "fas fa-bars"}></i>
+                        <span className="sr-only">Menu</span>
+                    </button>
+
+                    <div id="primary-navigation" className={`nav-menu ${navOpen ? 'open' : ''}`}>
+                        <button className="nav-link" onClick={() => { closeNav(); scrollToSection('features'); }}>
                             Features
                         </button>
-                        <button className="nav-link" onClick={() => scrollToSection('about')}>
+                        <button className="nav-link" onClick={() => { closeNav(); scrollToSection('about'); }}>
                             About
                         </button>
-                        <button className="nav-link" onClick={() => scrollToSection('contact')}>
+                        <button className="nav-link" onClick={() => { closeNav(); scrollToSection('contact'); }}>
                             Contact
                         </button>
-                        <button className="nav-btn nav-btn-outline" onClick={onNavigateToLogin}>
+                        <button className="nav-btn nav-btn-outline" onClick={() => { closeNav(); onNavigateToLogin(); }}>
                             Sign In
                         </button>
-                        <button className="nav-btn nav-btn-primary" onClick={onNavigateToRegister}>
+                        <button className="nav-btn nav-btn-primary" onClick={() => { closeNav(); onNavigateToRegister(); }}>
                             Get Started
                         </button>
                     </div>

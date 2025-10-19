@@ -75,10 +75,7 @@ body.landing-page {
   padding: 0;
   background: var(--bg-primary);
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
 }
 
 /* Logo Styles */
@@ -901,7 +898,7 @@ body.landing-page {
 
 /* Message Styles - FIXED */
 .message {
-  max-width: 75%;
+  max-width: min(75%, 700px);
   border-radius: 16px;
   font-size: 0.875rem;
   line-height: 1.6;
@@ -1006,12 +1003,12 @@ body.landing-page {
 .typing-indicator {
   color: var(--text-primary);
   align-self: flex-start;
-  margin-left: 50px; /* dagdag space para hindi tatamaan ng avatar */
+  margin-left: 50px;
   padding: 11px 12px;
   position: relative;
   margin-top: 8px;
   margin-bottom: 8px;
-  max-width: calc(80% - 50px); /* adjust para sakto sa space */
+  max-width: min(calc(80% - 50px), 720px);
   box-sizing: border-box;
   background: none;
   border: none;
@@ -1191,7 +1188,7 @@ body.landing-page {
 .code-content pre {
   margin: 0;
   font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-size: 0.875rem;
+  font-size: clamp(0.8rem, 1.8vw, 0.875rem);
   line-height: 1.6;
   color: var(--code-text);
   white-space: pre-wrap;
@@ -1758,6 +1755,13 @@ body.landing-page {
   }
 }
 
+/* Small device layout refinements */
+@media (max-width: 480px) {
+  #chat-box { padding: 16px; }
+  .user-message { max-width: 90%; }
+  .bot-message, .typing-indicator { margin-left: 44px; max-width: calc(92% - 44px); }
+}
+
 /* Desktop view - completely hide minimizer */
 @media (min-width: 769px) {
   .sidebar-minimizer {
@@ -1775,9 +1779,14 @@ body.landing-page {
     width: 70px !important;
   }
 
-  .message {
-    max-width: 80%;
-  }
+  .message { max-width: min(80%, 720px); }
+}
+
+/* Small devices improvements */
+@media (max-width: 480px) {
+  #chat-box { padding: 16px; }
+  .user-message { max-width: 90%; }
+  .bot-message, .typing-indicator { margin-left: 44px; max-width: calc(92% - 44px); }
 }
 
 .mobile-menu-btn {
