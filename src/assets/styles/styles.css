@@ -5,6 +5,17 @@
   box-sizing: border-box;
 }
 
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific fixes */
+  body {
+    height: -webkit-fill-available;
+  }
+  
+  #app-container {
+    height: -webkit-fill-available;
+  }
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -16,6 +27,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: var(--bg-secondary);
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
   overflow: hidden;
   color: var(--text-primary);
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -71,6 +83,7 @@ body.landing-page {
   display: flex;
   width: 100vw;
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
   margin: 0;
   padding: 0;
   background: var(--bg-primary);
@@ -852,6 +865,8 @@ body.landing-page {
   flex-direction: column;
   background: var(--bg-primary);
   position: relative;
+  min-width: 0; /* Prevent flex item from overflowing */
+  width: 100%;
 }
 
 .header-actions {
@@ -1435,6 +1450,7 @@ body.landing-page {
   background: var(--bg-secondary);
   box-sizing: border-box;
   position: relative;
+  flex-shrink: 0;
 }
 
 .input-wrapper {
@@ -1449,6 +1465,7 @@ body.landing-page {
   display: flex;
   flex-direction: column;
   min-height: 80px; /* Minimum height */
+  box-sizing: border-box;
 }
 
 .input-wrapper:focus-within {
@@ -1468,11 +1485,12 @@ body.landing-page {
   border: none;
   outline: none;
   background: transparent;
-  font-size: 15px;
+  font-size: clamp(14px, 2.5vw, 16px); /* Responsive font size */
   color: var(--text-primary);
   word-wrap: break-word;
   white-space: pre-wrap;
   font-family: inherit; /* Ensure font consistency */
+  box-sizing: border-box;
 }
 
 /* Better scrollbar styling */
@@ -1505,6 +1523,7 @@ body.landing-page {
   justify-content: flex-end;
   gap: 8px;
   padding: 0;
+  flex-shrink: 0;
 }
 
 /* Add smooth transition for height changes */
@@ -1577,21 +1596,32 @@ body.landing-page {
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
+  .input-container {
+    padding: 12px 16px;
+  }
+
   .input-wrapper {
-    padding: 14px 14px 50px 14px;
+    padding: 12px 12px 48px 12px;
+    border-radius: 20px;
+    min-height: 70px;
   }
   
   .button-group {
-    right: 6px;
-    left: 6px;
-    bottom: 6px;
-    height: 36px;
-    padding: 0 6px;
+    right: 8px;
+    bottom: 8px;
+    height: 32px;
+    gap: 6px;
   }
   
-  #send-btn {
+  #send-btn, #mic-btn {
     width: 32px;
     height: 32px;
+    font-size: 0.9rem;
+  }
+  
+  #user-input {
+    font-size: clamp(14px, 4vw, 16px);
+    max-height: 100px;
   }
 }
 
@@ -1680,6 +1710,11 @@ body.landing-page {
 
 /* Mobile view styles */
 @media (max-width: 768px) {
+  #app-container {
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
   /* Sidebar styles */
   .sidebar {
     width: 280px;
@@ -1738,6 +1773,114 @@ body.landing-page {
     cursor: pointer;
   }
 
+  .chat-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Chat Header Responsive */
+  .chat-header {
+    padding: 12px 16px;
+    min-height: 60px;
+  }
+
+  .header-info h2 {
+    font-size: 1.1rem;
+  }
+  /* Chat Box Responsive */
+  #chat-box {
+    padding: 16px 12px;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* Message Responsive Adjustments */
+  .message {
+    max-width: 95%;
+    font-size: 0.85rem;
+    padding: 12px 16px;
+  }
+
+  .user-message {
+    max-width: 85%;
+    padding: 12px 16px;
+  }
+
+  .bot-message {
+    margin-left: 40px;
+    max-width: calc(85% - 40px);
+    padding: 8px 12px;
+  }
+
+  .bot-message::before {
+    left: -38px;
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Welcome Message Responsive */
+  .welcome-message {
+    margin: 30px auto;
+    padding: 24px 20px;
+    max-width: 90%;
+  }
+
+  .welcome-message h3 {
+    font-size: 1.1rem;
+  }
+
+  .welcome-icon {
+    font-size: 2rem;
+  }
+
+  /* Input Container Responsive */
+  .input-container {
+    padding: 12px 16px;
+  }
+
+  .input-wrapper {
+    padding: 12px 12px 48px 12px;
+    min-height: 70px;
+  }
+
+  #user-input {
+    font-size: 14px;
+    max-height: 100px;
+  }
+
+  .button-group {
+    right: 8px;
+    bottom: 8px;
+    height: 32px;
+    gap: 6px;
+  }
+
+  #send-btn, #mic-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Sidebar Overlay */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.open + .sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 /* Small device layout refinements */
