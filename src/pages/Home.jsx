@@ -485,6 +485,7 @@ function Home({ onLogout }) {
     () => localStorage.getItem("sidebarCollapsed") === "true"
   );
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Make copyToClipboard available globally for the onclick handlers
   useEffect(() => {
@@ -910,13 +911,28 @@ function Home({ onLogout }) {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  // Watch screen resize
+  // Watch screen resize and handle responsive behavior
   useEffect(() => {
     function handleResize() {
-      if (window.innerWidth <= 768) {
+      const width = window.innerWidth;
+      const mobile = width <= 768;
+      setIsMobile(mobile);
+      
+      if (mobile) {
+        // Mobile: ensure sidebar is closed and not collapsed
         setSidebarCollapsed(false);
+        setSidebarOpen(false);
+      } else if (width <= 1024) {
+        // Tablet: allow collapsed sidebar
+        setSidebarOpen(false);
+      } else {
+        // Desktop: restore previous collapsed state
+        const savedCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
+        setSidebarCollapsed(savedCollapsed);
+        setSidebarOpen(false);
       }
     }
+    
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -1652,6 +1668,24 @@ function Home({ onLogout }) {
           )}
         </div>
       </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
+
+      {/* Mobile Menu Button */}
+      {isMobile && !sidebarOpen && (
+        <button 
+          className="mobile-menu-btn"
+          onClick={toggleSidebar}
+        >
+          <i className="fas fa-bars"></i>
+        </button>
+      )}
 
       {/* Chat Container */}
       <div className="chat-container">
