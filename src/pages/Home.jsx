@@ -1690,9 +1690,9 @@ function Home({ onLogout }) {
         </div>
 
         {/* Chat Box */}
-        <div id="chat-box" ref={chatBoxRef}>
+        <div id="chat-box" ref={chatBoxRef} className={chatMessages.length === 0 ? "empty-chat" : "has-messages"}>
           {chatMessages.length === 0 && !isTyping ? (
-            <div className="welcome-message">
+            <div className={`welcome-message ${chatMessages.length > 0 ? 'hidden' : ''}`}>
               <div className="welcome-icon">
                 <i className="fas fa-robot"></i>
               </div>
@@ -1786,8 +1786,8 @@ function Home({ onLogout }) {
         </div>
 
         {/* Input Area */}
-        <div className="input-container">
-          <div className="input-wrapper" id="chat-input-wrapper">
+        <div className={`input-container ${chatMessages.length === 0 ? 'no-messages' : 'has-messages'}`}>
+          <div className={`input-wrapper ${chatMessages.length === 0 ? 'expanded' : 'compact'}`} id="chat-input-wrapper">
             <textarea
               id="user-input"
               placeholder={
@@ -1814,6 +1814,7 @@ function Home({ onLogout }) {
                 }, 0);
               }}
               disabled={isTyping || apiStatus !== "available"}
+              className={chatMessages.length === 0 ? 'large-input' : 'normal-input'}
             />
 
             {isRecording && interimTranscript && (
@@ -1823,10 +1824,10 @@ function Home({ onLogout }) {
               </div>
             )}
 
-            <div className="button-group">
+            <div className={`button-group ${chatMessages.length === 0 ? 'large-buttons' : 'normal-buttons'}`}>
               <button
                 type="button"
-                className={`icon-btn ${isRecording ? 'recording' : ''}`}
+                className={`icon-btn ${isRecording ? 'recording' : ''} ${chatMessages.length === 0 ? 'large-btn' : ''}`}
                 id="mic-btn"
                 aria-label="Voice input"
                 onClick={toggleRecording}
@@ -1834,17 +1835,19 @@ function Home({ onLogout }) {
                 title={isSpeechSupported ? (isRecording ? "Stop recording" : "Start voice input") : "Voice input not supported"}
               >
                 <i className={`fas ${isRecording ? 'fa-stop' : 'fa-microphone'}`}></i>
+                {chatMessages.length === 0 && <span className="btn-label">Voice</span>}
               </button>
 
               <button
                 type="button"
-                className="icon-btn"
+                className={`icon-btn primary-btn ${chatMessages.length === 0 ? 'large-btn' : ''}`}
                 id="send-btn"
                 aria-label="Send message"
                 onClick={handleSend}
                 disabled={isTyping || !message.trim() || apiStatus !== "available"}
               >
                 <i className="fas fa-arrow-up"></i>
+                {chatMessages.length === 0 && <span className="btn-label">Send</span>}
               </button>
             </div>
 
