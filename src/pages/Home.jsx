@@ -1306,6 +1306,8 @@ function Home({ onLogout }) {
     setIsTyping(false);
     setCurrentSequence(0);
     setCurrentChatTitle("New Chat " + new Date().toLocaleDateString());
+    setHasUserSentMessage(false);
+    setMessage(""); // Clear any text in the input field
   };
 
   // Function to handle copy button clicks safely
@@ -1813,9 +1815,9 @@ function Home({ onLogout }) {
         {/* Input Area */}
         <div className="input-container">
           {/* Hide welcome text after user sends first message */}
-          {!hasUserSentMessage && chatMessages.length === 0 && (
-            <h1 className="input-welcome-text">How can I help you today, <span className="user-name">{firstName}</span>?</h1>
-          )}          
+{!hasUserSentMessage && chatMessages.length === 0 && (
+  <h1 className="input-welcome-text">How can I help you today, <span className="user-name">{firstName}</span>?</h1>
+)}    
           <div className="input-wrapper" id="chat-input-wrapper">
             <textarea
               id="user-input"
