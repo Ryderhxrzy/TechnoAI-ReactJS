@@ -509,14 +509,18 @@ body {
             color: white;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 480px) {
+        /* ===== ENHANCED RESPONSIVE DESIGN ===== */
+        
+        /* Extra Small Mobile (320px - 374px) */
+        @media (max-width: 374px) {
             body {
                 padding: 0;
                 display: block;
+                font-size: 14px;
             }
             
-            .login-container {
+            .login-container,
+            .verification-container {
                 margin: 0;
                 border-radius: 0;
                 min-height: 100vh;
@@ -525,35 +529,441 @@ body {
                 justify-content: center;
                 max-width: 100%;
                 border: none;
+                padding: 16px;
             }
 
             .login-header {
-                padding: 24px 24px 20px;
+                padding: 16px 0;
+            }
+
+            .logo {
+                margin-bottom: 16px;
+            }
+
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .logo-text {
+                font-size: 1.25rem;
+            }
+
+            .login-title {
+                font-size: 1.25rem;
+                margin-bottom: 6px;
+            }
+
+            .login-subtitle {
+                font-size: 0.8rem;
+                margin-bottom: 12px;
             }
 
             .login-form {
-                padding: 0 24px 24px;
+                padding: 0;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            .form-input {
+                padding: 10px 12px;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+
+            .btn {
+                padding: 12px 14px;
+                font-size: 0.875rem;
+            }
+
+            .form-options {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+                margin-bottom: 20px;
             }
 
             .theme-toggle {
-                top: 12px;
-                right: 12px;
-                width: 40px;
-                height: 40px;
+                top: 8px;
+                right: 8px;
+                width: 36px;
+                height: 36px;
+            }
+
+            .back-to-landing {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            /* Modal adjustments for extra small screens */
+            .modal-overlay {
+                padding: 8px;
+            }
+
+            .modal-content {
+                max-width: 100%;
+                max-height: 95vh;
+            }
+
+            .modal-header {
+                padding: 12px 16px;
+            }
+
+            .modal-header h2 {
+                font-size: 1.25rem;
+            }
+
+            .modal-body {
+                padding: 16px;
+                max-height: calc(95vh - 120px);
+            }
+
+            .agreement-checkbox {
+                padding: 12px;
+                margin: 16px 0;
             }
         }
 
-        /* Small devices (landscape phones, 576px and up) */
-        @media (min-width: 576px) and (max-width: 767px) {
-            .login-container {
+        /* Small Mobile (375px - 424px) */
+        @media (min-width: 375px) and (max-width: 424px) {
+            .login-container,
+            .verification-container {
+                padding: 20px;
+                border-radius: 8px;
+                margin: 16px;
+                max-width: calc(100% - 32px);
+                min-height: calc(100vh - 32px);
+            }
+
+            .login-header {
+                padding: 20px 0;
+            }
+
+            .login-title {
+                font-size: 1.375rem;
+            }
+
+            .form-options {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        /* Medium Mobile (425px - 479px) */
+        @media (min-width: 425px) and (max-width: 479px) {
+            .login-container,
+            .verification-container {
+                max-width: 380px;
+                margin: 20px auto;
+                padding: 24px;
+                border-radius: 12px;
+                min-height: auto;
+            }
+
+            .login-header {
+                padding: 24px 0 20px;
+            }
+
+            .login-form {
+                padding: 0;
+            }
+        }
+
+        /* Standard Mobile (480px - 767px) */
+        @media (min-width: 480px) and (max-width: 767px) {
+            body {
+                padding: 20px;
+            }
+            
+            .login-container,
+            .verification-container {
+                margin: 0 auto;
+                max-width: 400px;
+                border-radius: 16px;
+                min-height: auto;
+                padding: 32px;
+            }
+
+            .login-header {
+                padding: 32px 0 24px;
+            }
+
+            .login-form {
+                padding: 0;
+            }
+
+            .theme-toggle {
+                top: 16px;
+                right: 16px;
+                width: 40px;
+                height: 40px;
+            }
+
+            /* Modal improvements */
+            .modal-overlay {
+                padding: 20px;
+            }
+
+            .modal-content {
                 max-width: 90%;
             }
         }
 
-        /* Medium devices (tablets, 768px and up) */
-        @media (min-width: 768px) {
-            .login-container {
-                max-width: 400px;
+        /* Tablet Portrait (768px - 1024px) */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            body {
+                padding: 40px 20px;
+            }
+
+            .login-container,
+            .verification-container {
+                max-width: 450px;
+                margin: 0 auto;
+                padding: 40px;
+            }
+
+            .login-header {
+                padding: 40px 0 32px;
+            }
+
+            .logo {
+                margin-bottom: 32px;
+            }
+
+            .login-title {
+                font-size: 1.75rem;
+            }
+
+            .login-subtitle {
+                font-size: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 24px;
+            }
+
+            .form-input {
+                padding: 14px 16px;
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 14px 18px;
+                font-size: 1rem;
+            }
+
+            .theme-toggle {
+                top: 20px;
+                right: 20px;
+                width: 44px;
+                height: 44px;
+            }
+
+            /* Modal tablet styles */
+            .modal-content {
+                max-width: 600px;
+            }
+
+            .modal-header {
+                padding: 24px 32px;
+            }
+
+            .modal-body {
+                padding: 32px;
+            }
+        }
+
+        /* Desktop (1025px+) */
+        @media (min-width: 1025px) {
+            body {
+                padding: 60px 40px;
+            }
+
+            .login-container,
+            .verification-container {
+                max-width: 480px;
+                margin: 0 auto;
+                padding: 48px;
+            }
+
+            .login-header {
+                padding: 48px 0 40px;
+            }
+
+            .logo {
+                margin-bottom: 40px;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .logo-text {
+                font-size: 1.75rem;
+            }
+
+            .login-title {
+                font-size: 2rem;
+            }
+
+            .login-subtitle {
+                font-size: 1.125rem;
+            }
+
+            .form-group {
+                margin-bottom: 28px;
+            }
+
+            .form-input {
+                padding: 16px 18px;
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 16px 20px;
+                font-size: 1rem;
+            }
+
+            .theme-toggle {
+                top: 24px;
+                right: 24px;
+                width: 48px;
+                height: 48px;
+            }
+
+            /* Desktop modal styles */
+            .modal-content {
+                max-width: 800px;
+            }
+
+            .modal-header {
+                padding: 32px 40px;
+            }
+
+            .modal-body {
+                padding: 40px;
+            }
+
+            .modal-footer {
+                padding: 24px 40px;
+            }
+        }
+
+        /* Large Desktop (1440px+) */
+        @media (min-width: 1440px) {
+            .login-container,
+            .verification-container {
+                max-width: 520px;
+                padding: 56px;
+            }
+
+            .login-header {
+                padding: 56px 0 48px;
+            }
+
+            .login-title {
+                font-size: 2.25rem;
+            }
+
+            .theme-toggle {
+                top: 32px;
+                right: 32px;
+                width: 52px;
+                height: 52px;
+            }
+        }
+
+        /* Landscape orientation on mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 8px;
+            }
+
+            .login-container,
+            .verification-container {
+                min-height: auto;
+                max-height: calc(100vh - 16px);
+                overflow-y: auto;
+                margin: 8px auto;
+                padding: 16px 24px;
+            }
+
+            .login-header {
+                padding: 16px 0 12px;
+            }
+
+            .logo {
+                margin-bottom: 12px;
+            }
+
+            .login-title {
+                font-size: 1.25rem;
+                margin-bottom: 4px;
+            }
+
+            .login-subtitle {
+                font-size: 0.875rem;
+                margin-bottom: 8px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .form-options {
+                margin-bottom: 16px;
+            }
+
+            .theme-toggle {
+                top: 8px;
+                right: 8px;
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .google-icon {
+                background-image: url('https://www.google.com/favicon.ico');
+                background-size: 18px 18px;
+            }
+        }
+
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .spinner {
+                animation: none;
+            }
+            
+            .btn,
+            .form-input,
+            .theme-toggle {
+                transition: none;
+            }
+        }
+
+        /* Dark mode specific responsive adjustments */
+        @media (prefers-color-scheme: dark) {
+            .modal-content {
+                border: 1px solid var(--border-primary);
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .theme-toggle,
+            .spinner-container,
+            .btn-google {
+                display: none;
+            }
+            
+            .login-container,
+            .verification-container {
+                box-shadow: none;
+                border: 1px solid #ccc;
             }
         }
 

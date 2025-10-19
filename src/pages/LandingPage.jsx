@@ -7,6 +7,7 @@ function LandingPage({ onNavigateToLogin, onNavigateToRegister }) {
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem("theme") || "light";
     });
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
@@ -28,6 +29,11 @@ function LandingPage({ onNavigateToLogin, onNavigateToRegister }) {
         if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
         }
+        setMobileMenuOpen(false); // Close mobile menu after navigation
+    };
+
+    const toggleMobileMenu = () => {
+        setMobileMenuOpen(!mobileMenuOpen);
     };
 
     return (
@@ -61,6 +67,44 @@ function LandingPage({ onNavigateToLogin, onNavigateToRegister }) {
                             Get Started
                         </button>
                     </div>
+                    
+                    {/* Mobile Menu Button */}
+                    <div style={{ position: 'relative' }}>
+                        <button className="nav-menu-mobile" onClick={toggleMobileMenu}>
+                            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+                            <span style={{ marginLeft: '8px' }}>Menu</span>
+                        </button>
+                        
+                        {/* Mobile Menu Dropdown */}
+                        <div className={`nav-menu-dropdown ${mobileMenuOpen ? 'open' : ''}`}>
+                            <button className="nav-link" onClick={() => scrollToSection('features')}>
+                                <i className="fas fa-star"></i>
+                                Features
+                            </button>
+                            <button className="nav-link" onClick={() => scrollToSection('about')}>
+                                <i className="fas fa-info-circle"></i>
+                                About
+                            </button>
+                            <button className="nav-link" onClick={() => scrollToSection('contact')}>
+                                <i className="fas fa-envelope"></i>
+                                Contact
+                            </button>
+                            <button className="nav-btn nav-btn-outline" onClick={() => { onNavigateToLogin(); setMobileMenuOpen(false); }}>
+                                <i className="fas fa-sign-in-alt"></i>
+                                Sign In
+                            </button>
+                            <button className="nav-btn nav-btn-primary" onClick={() => { onNavigateToRegister(); setMobileMenuOpen(false); }}>
+                                <i className="fas fa-rocket"></i>
+                                Get Started
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {/* Mobile Menu Overlay */}
+                    <div 
+                        className={`nav-menu-overlay ${mobileMenuOpen ? 'open' : ''}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                    ></div>
                 </div>
             </nav>
 
