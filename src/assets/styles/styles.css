@@ -1,8 +1,21 @@
-/* CSS Custom Properties for Light and Dark Themes *//* Base Styles */
+/* CSS Custom Properties for Light and Dark Themes */
+/* Base Styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+/* Viewport fixes for mobile browsers */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific fixes */
+  body {
+    height: -webkit-fill-available;
+  }
+  
+  #app-container {
+    height: -webkit-fill-available;
+  }
 }
 
 html, body {
@@ -16,6 +29,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background: var(--bg-secondary);
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
   overflow: hidden;
   color: var(--text-primary);
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -71,6 +85,7 @@ body.landing-page {
   display: flex;
   width: 100vw;
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
   margin: 0;
   padding: 0;
   background: var(--bg-primary);
@@ -852,6 +867,8 @@ body.landing-page {
   flex-direction: column;
   background: var(--bg-primary);
   position: relative;
+  min-width: 0; /* Prevent flex item from overflowing */
+  width: 100%;
 }
 
 .header-actions {
@@ -887,6 +904,8 @@ body.landing-page {
   flex-direction: column;
   gap: 16px;
   min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .messages-container {
@@ -1427,7 +1446,7 @@ body.landing-page {
 }
 
 /* Input Container */
-/* Input Container - FIXED */
+/* Input Container - RESPONSIVE FIXED */
 .input-container {
   max-width: 100%;
   width: 100%;
@@ -1435,6 +1454,7 @@ body.landing-page {
   background: var(--bg-secondary);
   box-sizing: border-box;
   position: relative;
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .input-wrapper {
@@ -1449,6 +1469,7 @@ body.landing-page {
   display: flex;
   flex-direction: column;
   min-height: 80px; /* Minimum height */
+  box-sizing: border-box;
 }
 
 .input-wrapper:focus-within {
@@ -1457,7 +1478,7 @@ body.landing-page {
 }
 
 #user-input {
-  width: 100%; /* Changed to 100% */
+  width: 100%; /* Full width */
   min-height: 24px;
   max-height: 120px; /* Reduced max height */
   overflow-y: auto;
@@ -1468,11 +1489,12 @@ body.landing-page {
   border: none;
   outline: none;
   background: transparent;
-  font-size: 15px;
+  font-size: clamp(14px, 2.5vw, 16px); /* Responsive font size */
   color: var(--text-primary);
   word-wrap: break-word;
   white-space: pre-wrap;
   font-family: inherit; /* Ensure font consistency */
+  box-sizing: border-box;
 }
 
 /* Better scrollbar styling */
@@ -1505,6 +1527,7 @@ body.landing-page {
   justify-content: flex-end;
   gap: 8px;
   padding: 0;
+  flex-shrink: 0; /* Prevent buttons from shrinking */
 }
 
 /* Add smooth transition for height changes */
@@ -1575,23 +1598,84 @@ body.landing-page {
   cursor: not-allowed;
 }
 
-/* Mobile responsiveness */
+/* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
+  .input-container {
+    padding: 12px 16px;
+  }
+  
   .input-wrapper {
-    padding: 14px 14px 50px 14px;
+    padding: 12px 12px 48px 12px;
+    border-radius: 20px;
+    min-height: 70px;
+  }
+  
+  .button-group {
+    right: 8px;
+    bottom: 8px;
+    height: 32px;
+    gap: 6px;
+  }
+  
+  #send-btn, #mic-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+  
+  #user-input {
+    font-size: clamp(14px, 4vw, 16px);
+    max-height: 100px;
+  }
+}
+
+/* Extra small devices (phones in portrait) */
+@media (max-width: 480px) {
+  .input-container {
+    padding: 10px 12px;
+  }
+  
+  .input-wrapper {
+    padding: 10px 10px 44px 10px;
+    border-radius: 18px;
+    min-height: 60px;
   }
   
   .button-group {
     right: 6px;
-    left: 6px;
     bottom: 6px;
-    height: 36px;
-    padding: 0 6px;
+    height: 30px;
+    gap: 4px;
   }
   
-  #send-btn {
-    width: 32px;
-    height: 32px;
+  #send-btn, #mic-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+  
+  #user-input {
+    font-size: 14px;
+    max-height: 80px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .input-container {
+    padding: 20px 24px;
+  }
+  
+  .input-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+}
+
+/* Very wide screens */
+@media (min-width: 1600px) {
+  .input-wrapper {
+    max-width: 1200px;
   }
 }
 
@@ -1678,18 +1762,19 @@ body.landing-page {
   display: none;
 }
 
-/* Mobile view styles */
+/* Enhanced Mobile view styles */
 @media (max-width: 768px) {
   /* Sidebar styles */
   .sidebar {
-    width: 280px;
+    width: min(280px, 85vw); /* Responsive width */
     position: fixed;
-    left: -280px;
+    left: -100vw;
     top: 0;
     bottom: 0;
     z-index: 1000;
     transition: transform 0.3s ease;
     transform: translateX(-100%);
+    max-width: 320px;
   }
 
   .sidebar.open {
@@ -1736,8 +1821,30 @@ body.landing-page {
     justify-content: center;
     z-index: 900;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
-
+  
+  /* Ensure chat container takes full width on mobile */
+  .chat-container {
+    width: 100%;
+    min-width: 0;
+  }
+  
+  /* Adjust chat box padding for mobile */
+  #chat-box {
+    padding: 16px 12px;
+  }
+  
+  /* Better message spacing on mobile */
+  .user-message {
+    max-width: 85%;
+    margin-right: 12px;
+  }
+  
+  .bot-message {
+    margin-left: 40px;
+    max-width: calc(85% - 40px);
+  }
 }
 
 /* Small device layout refinements */
@@ -1772,6 +1879,178 @@ body.landing-page {
   #chat-box { padding: 16px; }
   .user-message { max-width: 90%; }
   .bot-message, .typing-indicator { margin-left: 44px; max-width: calc(92% - 44px); }
+}
+
+/* Landscape orientation fixes */
+@media (max-height: 500px) and (orientation: landscape) {
+  body {
+    height: 100vh;
+    height: 100svh; /* Small viewport height for landscape */
+  }
+  
+  #app-container {
+    height: 100vh;
+    height: 100svh;
+  }
+  
+  .input-container {
+    padding: 8px 16px;
+  }
+  
+  .input-wrapper {
+    padding: 8px 8px 40px 8px;
+    min-height: 50px;
+    border-radius: 16px;
+  }
+  
+  .button-group {
+    right: 6px;
+    bottom: 6px;
+    height: 28px;
+  }
+  
+  #send-btn, #mic-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+  
+  #user-input {
+    font-size: 14px;
+    max-height: 60px;
+  }
+  
+  #chat-box {
+    padding: 12px;
+  }
+}
+
+/* Very tall devices (long phones) */
+@media (min-height: 800px) and (max-width: 480px) {
+  .input-container {
+    padding: 16px 20px 20px 20px;
+  }
+  
+  .input-wrapper {
+    padding: 16px 16px 52px 16px;
+    min-height: 85px;
+  }
+  
+  #user-input {
+    max-height: 140px;
+    font-size: 15px;
+  }
+  
+  .button-group {
+    height: 36px;
+  }
+  
+  #send-btn, #mic-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* Ultra-wide screens */
+@media (min-width: 1920px) {
+  .input-wrapper {
+    max-width: 1400px;
+  }
+  
+  .sidebar {
+    width: 320px;
+  }
+  
+  .sidebar.collapsed {
+    width: 80px !important;
+  }
+}
+
+/* Foldable devices and unusual aspect ratios */
+@media (min-aspect-ratio: 3/1) {
+  .sidebar {
+    width: 280px;
+  }
+  
+  .input-wrapper {
+    max-width: 800px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  #user-input {
+    font-size: clamp(15px, 2.5vw, 17px);
+  }
+  
+  .button-group {
+    gap: 10px;
+  }
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .input-wrapper,
+  .button-group,
+  #send-btn,
+  #mic-btn {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets for mobile */
+  #send-btn, #mic-btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+  }
+  
+  .button-group {
+    gap: 12px;
+    height: 44px;
+  }
+  
+  .input-wrapper {
+    padding: 16px 16px 60px 16px; /* More space for larger buttons */
+  }
+  
+  /* Ensure input is always visible above virtual keyboard */
+  .input-container {
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+  }
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (max-width: 768px) {
+  #user-input {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Ensure proper scrolling behavior */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Fix for devices with notches */
+@supports (padding: max(0px)) {
+  .input-container {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  
+  .sidebar {
+    padding-left: env(safe-area-inset-left);
+  }
 }
 
 .mobile-menu-btn {
