@@ -864,10 +864,32 @@ body.landing-page {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   position: relative;
   min-width: 0; /* Prevent flex item from overflowing */
   width: 100%;
+}
+
+/* Empty chat state - centers input */
+.empty-chat-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Chat container with messages - normal layout */
+.chat-container.has-messages {
+  justify-content: flex-start;
+}
+
+.chat-container.has-messages #chat-box {
+  flex: 1;
+}
+
+.chat-container.has-messages .input-container {
+  position: relative;
+  bottom: 0;
 }
 
 .header-actions {
@@ -903,6 +925,18 @@ body.landing-page {
   flex-direction: column;
   gap: 16px;
   min-height: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hide chat box when no messages for cleaner centered input */
+.chat-container:not(.has-messages) #chat-box {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chat-container.has-messages #chat-box {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .messages-container {
@@ -1443,15 +1477,36 @@ body.landing-page {
 }
 
 /* Input Container */
-/* Input Container - FIXED */
+/* Input Container - CURSOR-LIKE CENTERED */
 .input-container {
   max-width: 100%;
   width: 100%;
   padding: 16px 20px;
-  background: var(--bg-secondary);
   box-sizing: border-box;
   position: relative;
   flex-shrink: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Centered state when no messages */
+.chat-container:not(.has-messages) .input-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 800px;
+  width: calc(100% - 40px);
+  z-index: 10;
+}
+
+/* Bottom state when messages exist */
+.chat-container.has-messages .input-container {
+  position: relative;
+  transform: none;
+  top: auto;
+  left: auto;
+  max-width: 100%;
+  width: 100%;
 }
 
 .input-wrapper {
@@ -1624,30 +1679,41 @@ body.landing-page {
     font-size: clamp(14px, 4vw, 16px);
     max-height: 100px;
   }
+
+  /* Mobile centered input adjustments */
+  .chat-container:not(.has-messages) .input-container {
+    width: calc(100% - 32px);
+    max-width: 500px;
+  }
+
+  .chat-container:not(.has-messages) #user-input::placeholder {
+    font-size: 14px;
+  }
 }
 
-/* Welcome Message */
-.welcome-message {
+/* Empty chat state - no welcome message */
+.empty-chat-state {
+  display: none; /* Completely hidden */
+}
+
+/* Centered input styling improvements */
+.chat-container:not(.has-messages) .input-wrapper {
+  border: 2px solid var(--border-primary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: var(--bg-elevated);
+}
+
+.chat-container:not(.has-messages) .input-wrapper:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 24px rgba(16, 163, 127, 0.2);
+}
+
+/* Cursor-like placeholder styling for centered state */
+.chat-container:not(.has-messages) #user-input::placeholder {
   text-align: center;
-  color: var(--text-secondary);
-  margin: 50px auto;
-  padding: 40px;
-  border-radius: 16px;
-  border: 1px solid var(--border-primary);
-  max-width: 500px;
-}
-
-.welcome-icon {
-  font-size: 2.5rem;
+  font-size: 16px;
   color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-.welcome-message h3 {
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 8px;
+  opacity: 0.8;
 }
 
 /* Enhanced Text Formatting */
@@ -2039,4 +2105,51 @@ button, input[type="text"], textarea, .chat-item, .action-btn {
 
 .response-italic {
   font-style: italic;
+}
+
+/* Input Welcome Text Styling */
+.input-welcome-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0 0 24px 0;
+  padding: 0 20px;
+  line-height: 1.4;
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+
+/* Responsive sizing */
+@media (max-width: 768px) {
+  .input-welcome-text {
+    font-size: 1.25rem;
+    margin: 0 0 20px 0;
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .input-welcome-text {
+    font-size: 1.1rem;
+    margin: 0 0 16px 0;
+  }
+}
+
+/* When chat has messages, make it more subtle */
+.chat-container.has-messages .input-welcome-text {
+  font-size: 1.1rem;
+  margin: 0 0 16px 0;
+  opacity: 0.8;
+}
+
+/* Dark theme adjustment */
+[data-theme="dark"] .input-welcome-text {
+  opacity: 0.95;
+}
+.user-name {
+  font-weight: 600;
+  color: var(--accent-primary);
+  opacity: 0.9;
+  transition: all 0.3s ease;
 }

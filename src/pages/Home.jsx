@@ -1662,7 +1662,7 @@ function Home({ onLogout }) {
       />
 
       {/* Chat Container */}
-      <div className="chat-container">
+      <div className={`chat-container ${chatMessages.length > 0 ? 'has-messages' : ''}`}>
         {/* Chat Header */}
         <div className="chat-header">
           <div className="header-info">
@@ -1692,17 +1692,8 @@ function Home({ onLogout }) {
         {/* Chat Box */}
         <div id="chat-box" ref={chatBoxRef}>
           {chatMessages.length === 0 && !isTyping ? (
-            <div className="welcome-message">
-              <div className="welcome-icon">
-                <i className="fas fa-robot"></i>
-              </div>
-              <h3>Welcome to Techno.ai, {firstName}!</h3>
-              <p>
-                {apiStatus === "available" 
-                  ? "I'm here to help you with step-by-step solutions, coding guidance, and detailed explanations. Ask me anything and I'll break it down for you!"
-                  : "Please configure your Gemini API key to start chatting."}
-              </p>
-              
+            <div className="empty-chat-state">
+              {/* Empty state - no welcome message */}
             </div>
           ) : (
             <div className="messages-container">
@@ -1787,12 +1778,13 @@ function Home({ onLogout }) {
 
         {/* Input Area */}
         <div className="input-container">
+          <h1 className="input-welcome-text">How can I help you today, <span className="user-name">{firstName}</span>?</h1>
           <div className="input-wrapper" id="chat-input-wrapper">
             <textarea
               id="user-input"
               placeholder={
                 apiStatus === "available" 
-                  ? (isRecording ? "Speak now..." : "Ask Techno.ai for step-by-step solutions...") 
+                  ? (isRecording ? "Speak now..." : chatMessages.length === 0 ? "Ask Techno.ai for step-by-step solutions..." : "What can i help you with?") 
                   : "Configure API key to chat"
               }
               rows="1"
