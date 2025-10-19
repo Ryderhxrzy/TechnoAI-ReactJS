@@ -206,3 +206,24 @@ img, video {
   width: min(100% - 2rem, 1200px);
   margin-inline: auto;
 }
+
+/* Apply transitions to specific properties that change with theme */
+[data-theme] {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme] * {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* Exclude interactive elements from the long transition */
+[data-theme] button,
+[data-theme] input,
+[data-theme] textarea,
+[data-theme] .sidebar-minimizer,
+[data-theme] .header-minimizer {
+  transition: all 0.2s ease !important;
+}

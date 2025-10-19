@@ -944,6 +944,9 @@ body.landing-page {
   flex-direction: column;
   gap: 16px;
   flex: 1;
+  max-width: min(800px, 90vw);
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* Message Styles - FIXED */
@@ -972,8 +975,8 @@ body.landing-page {
 
 /* User Message - RIGHT SIDE */
 .user-message {
-  margin-left: auto; /* Push to right */
-  align-self: flex-end; /* Align to right */
+  margin-left: auto;
+  align-self: flex-end;
   max-width: 85%;
   width: fit-content;
   color: var(--text-primary);
@@ -985,7 +988,7 @@ body.landing-page {
   word-wrap: break-word;
   word-break: break-word;
   overflow-wrap: anywhere;
-  display: flex; /* Override the block display from .message */
+  display: flex;
 }
 
 /* Message Content Structure */
@@ -1058,14 +1061,14 @@ body.landing-page {
   position: relative;
   margin-top: 8px;
   margin-bottom: 8px;
-  max-width: min(calc(80% - 50px), 720px);
+  max-width: min(calc(85% - 50px), calc(800px - 50px));
   box-sizing: border-box;
   background: none;
   border: none;
   box-shadow: none;
   word-wrap: break-word;
   line-height: 1.4;
-  display: flex; /* ensure flex layout for proper alignment */
+  display: flex;
 }
 
 /* Bot Avatar - positioned sa taas ng message */
@@ -1510,20 +1513,20 @@ body.landing-page {
 }
 
 .input-wrapper {
-  max-width: 100%;
+  max-width: min(800px, 90vw);
   width: 100%;
+  margin: 0 auto;
   position: relative;
   background: var(--bg-input);
   border: 1px solid var(--border-primary);
   border-radius: 24px;
-  padding: 16px 16px 56px 16px; /* Increased bottom padding for buttons */
+  padding: 16px 16px 56px 16px;
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  min-height: 80px; /* Minimum height */
+  min-height: 80px;
   box-sizing: border-box;
 }
-
 .input-wrapper:focus-within {
   border-color: var(--accent-primary);
   box-shadow: 0 2px 12px rgba(16, 163, 127, 0.15);

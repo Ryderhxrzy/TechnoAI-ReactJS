@@ -480,6 +480,8 @@ function Home({ onLogout }) {
   const userProfileRef = useRef(null);
   const chatBoxRef = useRef(null);
 
+  const [hasUserSentMessage, setHasUserSentMessage] = useState(false);
+
   // Sidebar states
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem("sidebarCollapsed") === "true"
@@ -1125,6 +1127,8 @@ function Home({ onLogout }) {
     setMessage("");
     setIsTyping(true);
 
+    setHasUserSentMessage(true);
+
     // Update chat title on first message
     let finalChatTitle = currentChatTitle;
     if (chatMessages.length === 0) {
@@ -1194,6 +1198,19 @@ function Home({ onLogout }) {
     } finally {
       setIsTyping(false);
     }
+  };
+
+  const getInputPlaceholder = () => {
+    if (apiStatus !== "available") {
+      return "Configure API key to chat";
+    }
+    
+    if (isRecording) {
+      return "Speak now...";
+    }
+    
+    // Always show placeholder on left, but change text based on state
+    return "Ask Techno.ai for step-by-step solutions...";
   };
 
   const handleKeyDown = (e) => {
@@ -1778,15 +1795,14 @@ function Home({ onLogout }) {
 
         {/* Input Area */}
         <div className="input-container">
-          <h1 className="input-welcome-text">How can I help you today, <span className="user-name">{firstName}</span>?</h1>
+          {/* Hide welcome text after user sends first message */}
+          {!hasUserSentMessage && chatMessages.length === 0 && (
+            <h1 className="input-welcome-text">How can I help you today, <span className="user-name">{firstName}</span>?</h1>
+          )}          
           <div className="input-wrapper" id="chat-input-wrapper">
             <textarea
               id="user-input"
-              placeholder={
-                apiStatus === "available" 
-                  ? (isRecording ? "Speak now..." : chatMessages.length === 0 ? "Ask Techno.ai for step-by-step solutions..." : "What can i help you with?") 
-                  : "Configure API key to chat"
-              }
+              placeholder={getInputPlaceholder()}
               rows="1"
               aria-label="Message"
               value={isRecording && interimTranscript ? message + interimTranscript : message}
@@ -1806,6 +1822,7 @@ function Home({ onLogout }) {
                 }, 0);
               }}
               disabled={isTyping || apiStatus !== "available"}
+              style={{ textAlign: 'left' }} // Ensure text is left-aligned
             />
 
             {isRecording && interimTranscript && (
