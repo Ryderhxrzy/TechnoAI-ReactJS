@@ -1787,12 +1787,41 @@ function Home({ onLogout }) {
 
         {/* Input Area */}
         <div className="input-container">
+          {/* Placeholder text that shows when no messages and no input */}
+          {chatMessages.length === 0 && !message.trim() && !isTyping && (
+            <div 
+              className="input-placeholder-text"
+              role="button"
+              tabIndex="0"
+              aria-label="Click to focus input and start typing your question"
+              onClick={() => {
+                const input = document.getElementById('user-input');
+                if (input) {
+                  input.focus();
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  const input = document.getElementById('user-input');
+                  if (input) {
+                    input.focus();
+                  }
+                }
+              }}
+            >
+              <div className="placeholder-content">
+                <i className="fas fa-lightbulb placeholder-icon" aria-hidden="true"></i>
+                <span>Ask Techno.ai for step-by-step solutions...</span>
+              </div>
+            </div>
+          )}
           <div className="input-wrapper" id="chat-input-wrapper">
             <textarea
               id="user-input"
               placeholder={
                 apiStatus === "available" 
-                  ? (isRecording ? "Speak now..." : "Ask Techno.ai for step-by-step solutions...") 
+                  ? (isRecording ? "Speak now..." : "") 
                   : "Configure API key to chat"
               }
               rows="1"
