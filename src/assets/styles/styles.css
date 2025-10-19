@@ -1738,21 +1738,6 @@ body.landing-page {
     cursor: pointer;
   }
 
-  /* Overlay */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-  }
-
-  .sidebar.open ~ .sidebar-overlay {
-    display: block;
-  }
 }
 
 /* Small device layout refinements */
