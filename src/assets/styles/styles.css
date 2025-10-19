@@ -1709,6 +1709,86 @@ body.landing-page {
   display: none;
 }
 
+/* Tall mobile devices (height > 860px) - position input container at top for better UX */
+@media (min-height: 861px) and (max-width: 768px) {
+  .chat-container {
+    flex-direction: column;
+  }
+  
+  .chat-header {
+    order: 0; /* Header stays at very top */
+  }
+  
+  .input-container {
+    order: 1; /* Input container right after header */
+    border-bottom: 1px solid var(--border-primary);
+    border-top: none;
+    position: sticky;
+    top: 60px; /* Stick below header */
+    z-index: 10;
+    background: var(--bg-secondary);
+  }
+  
+  #chat-box {
+    order: 2; /* Chat messages below input */
+    padding-top: 12px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  /* Adjust welcome message for top input layout */
+  .welcome-message {
+    margin-top: 20px;
+  }
+  
+  /* Ensure proper spacing when input is at top */
+  .messages-container {
+    padding-top: 8px;
+  }
+}
+
+/* Additional responsive improvements for tall mobile devices */
+@media (min-height: 861px) and (max-width: 768px) and (orientation: portrait) {
+  /* Optimize for portrait tall screens */
+  .input-wrapper {
+    min-height: 60px;
+    padding: 10px 10px 40px 10px;
+  }
+  
+  .button-group {
+    bottom: 6px;
+    right: 6px;
+  }
+  
+  #user-input {
+    max-height: 80px; /* Reduce max height on tall screens */
+  }
+  
+  /* Improve message spacing */
+  .message {
+    margin-bottom: 6px;
+  }
+  
+  .bot-message {
+    margin-left: 35px;
+    max-width: calc(88% - 35px);
+  }
+  
+  .bot-message::before {
+    left: -33px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Fallback for very tall mobile devices using viewport height units */
+@media (min-height: 100vh) and (max-width: 768px) {
+  .input-container {
+    /* Ensure input container doesn't take too much space on very tall screens */
+    max-height: 120px;
+  }
+}
+
 /* Mobile view styles */
 @media (max-width: 768px) {
   #app-container {
