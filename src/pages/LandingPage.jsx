@@ -291,22 +291,10 @@ function LandingPage({ onNavigateToLogin, onNavigateToRegister }) {
                         </div>
                         <div className="footer-links">
                             <div className="footer-column">
-                                <h4 className="footer-title">Product</h4>
-                                <a href="#" className="footer-link">Features</a>
-                                <a href="#" className="footer-link">Pricing</a>
-                                <a href="#" className="footer-link">Updates</a>
-                            </div>
-                            <div className="footer-column">
-                                <h4 className="footer-title">Support</h4>
-                                <a href="#" className="footer-link">Help Center</a>
-                                <a href="#" className="footer-link">Contact Us</a>
-                                <a href="#" className="footer-link">Community</a>
-                            </div>
-                            <div className="footer-column">
-                                <h4 className="footer-title">BCP</h4>
-                                <a href="#" className="footer-link">About BCP</a>
-                                <a href="#" className="footer-link">BSIT Program</a>
-                                <a href="#" className="footer-link">Student Resources</a>
+                                <h4 className="footer-title">Navigate</h4>
+                                <a href="#" className="footer-link"onClick={() => { closeNav(); scrollToSection('features'); }}>Features</a>
+                                <a href="#" className="footer-link"onClick={() => { closeNav(); scrollToSection('about'); }}>About</a>
+                                <a href="#" className="footer-link"onClick={() => { closeNav(); scrollToSection('contact'); }}>Contact</a>
                             </div>
                         </div>
                     </div>
