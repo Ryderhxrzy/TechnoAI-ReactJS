@@ -413,7 +413,7 @@ Frequent mistakes and quick fixes.
 ## Resources
 Useful references or documentation.
 
-Keep responses concise (under 5000 tokens), educational, and focused on real-world IT applications.
+Keep responses concise (under 8000 tokens), educational, and focused on real-world IT applications.
 
 Now answer: "${userMessage}"
 `.trim();
@@ -876,7 +876,7 @@ function Home({ onLogout }) {
             }
           ],
           generationConfig: {
-            maxOutputTokens: 5000,
+            maxOutputTokens: 8000,
             temperature: 0.7,
           }
         };
