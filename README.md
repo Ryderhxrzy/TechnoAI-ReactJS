@@ -231,4 +231,4 @@ This project is licensed under the **MIT License**.
 ---
 
 ## 🌐 Website
-🔗 [techno.ai]([https://techno.ai](https://techno-ai-react-js.vercel.app/))
+🔗 ([https://techno.ai](https://techno-ai-react-js.vercel.app/))
