@@ -1,4 +1,4 @@
-# 🧠 Techno.ai
+# 🧠 TechnoAI-ReactJS
 
 **Techno.ai** — an AI-powered platform built with the **MERN stack** that provides **BSIT students** with personalized step-by-step guidance, coding help, and clear explanations.
 
@@ -24,90 +24,126 @@ It helps students understand code, generate examples, and learn efficiently usin
 
 ## 📁 Folder Structure
 
-/Techno.ai  
-│  
-├── /backend               # Express.js + MongoDB backend  
-│   ├── server.js  
-│   ├── package.json  
-│   └── .env  
-│  
-├── /TechnoAI-ReactJS      # React frontend (Vite)  
-│   ├── src/  
-│   ├── vite.config.js  
-│   ├── package.json  
-│   └── .env  
-│  
+Here’s the full project structure for **TechnoAI-ReactJS**:
+
+```
+/TechnoAI-ReactJS
+│
+├── /backend
+│   ├── /models
+│   │   └── Message.js
+│   │
+│   ├── /routes
+│   │   ├── ai.js
+│   │   ├── auth.js
+│   │   ├── health.js
+│   │   └── messages.js
+│   │
+│   ├── server.js
+│   ├── package.json
+│   └── .env
+│
+├── /src
+│   ├── index.html
+│   ├── Login.jsx
+│   ├── Register.jsx
+│   └── (other necessary frontend files)
+│
+├── .env
+├── vite.config.js
+├── package.json
 └── README.md
+```
 
 ---
 
 ## 🧩 Features
 
-- 🤖 Personalized AI help for BSIT students  
-- 🧾 Step-by-step code explanations  
-- 🔐 Google OAuth login  
-- 💬 Real-time responses using Gemini API  
-- 🗃️ MongoDB integration  
-- 🌍 RESTful API communication  
+- 🤖 Personalized AI tutoring for BSIT students  
+- 🧾 Step-by-step coding help and explanations  
+- 🔐 Google OAuth login integration  
+- 💬 Gemini API for AI-generated content  
+- 🗃️ MongoDB Atlas for secure data storage  
+- 🌍 RESTful API communication between backend and frontend  
 
 ---
 
 ## 📋 Prerequisites
 
-Make sure you have installed:
+Before running the project, ensure you have:
 - Node.js (v18 or newer)
-- npm
-- MongoDB Atlas
-- Google Cloud Console (for OAuth)
-- Gemini API key
+- npm (or Yarn)
+- MongoDB Atlas account (or local MongoDB)
+- Google Cloud Console project (for OAuth)
+- Gemini API key (from [Google AI Studio](https://aistudio.google.com/))
 
 ---
 
 ## ⚙️ Environment Setup
 
-### 1️⃣ Clone the repository
-git clone https://github.com/<your-username>/Techno.ai.git  
-cd Techno.ai
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/<your-username>/TechnoAI-ReactJS.git
+cd TechnoAI-ReactJS
+```
 
-### 2️⃣ Install dependencies
+### 2️⃣ Install Dependencies
 
 #### Backend
-cd backend  
+```bash
+cd backend
 npm install
+```
 
 #### Frontend
-cd ../TechnoAI-ReactJS  
+```bash
+cd ..
 npm install
+```
 
 ---
 
-## 🗝️ 3️⃣ Create .env Files
+## 🗝️ 3️⃣ Create `.env` Files
 
-### Backend (.env inside /backend)
-MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/technoai?retryWrites=true&w=majority  
+You’ll need two environment files — one for the backend and one for the frontend.
+
+### Backend `.env` (inside `/backend/.env`)
+```
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/technoai?retryWrites=true&w=majority
 PORT=5000
+```
 
-### Frontend (.env inside /TechnoAI-ReactJS)
-VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com  
-VITE_APP_GEMINI_API_KEY=your-gemini-api-key  
+### Frontend `.env` (inside the root `/TechnoAI-ReactJS/.env`)
+```
+VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+VITE_APP_GEMINI_API_KEY=your-gemini-api-key
 VITE_API_BASE_URL=http://localhost:5000/api
+```
 
 ---
 
 ## ▶️ 4️⃣ Run the Application
 
-### Start Backend Server
-cd backend  
-npm run dev  
-# or  
-node server.js
-
-### Start Frontend (Vite React)
-cd ../TechnoAI-ReactJS  
+### Start the Backend
+```bash
+cd backend
 npm run dev
+```
+or
+```bash
+node server.js
+```
 
-Then open your browser and go to:  
+### Start the Frontend
+```bash
+cd ..
+npm run dev
+```
+
+Once both are running, open your browser and go to:
+```
 http://localhost:5173
+```
 
 ---
 
@@ -115,42 +151,25 @@ http://localhost:5173
 
 | Variable | Location | Description | Example |
 |-----------|-----------|--------------|----------|
-| MONGO_URI | Backend | MongoDB connection string | mongodb+srv://user:pass@cluster.mongodb.net/technoai |
-| PORT | Backend | Server port | 5000 |
-| VITE_GOOGLE_CLIENT_ID | Frontend | Google OAuth Client ID | your-google-client-id.apps.googleusercontent.com |
-| VITE_APP_GEMINI_API_KEY | Frontend | Gemini AI API Key | AIzaSy... |
-| VITE_API_BASE_URL | Frontend | Backend API URL | http://localhost:5000/api |
+| `MONGO_URI` | Backend | MongoDB connection string | mongodb+srv://user:pass@cluster.mongodb.net/technoai |
+| `PORT` | Backend | Backend server port | 5000 |
+| `VITE_GOOGLE_CLIENT_ID` | Frontend | Google OAuth Client ID | your-google-client-id.apps.googleusercontent.com |
+| `VITE_APP_GEMINI_API_KEY` | Frontend | Gemini API Key | AIzaSy... |
+| `VITE_API_BASE_URL` | Frontend | API base URL | http://localhost:5000/api |
 
 ---
 
-## 🧾 Example Root Scripts (optional)
+## 🏗️ Build and Deployment
 
-In your root folder, you can add a package.json with:
+### Build the Frontend
+```bash
+npm run build
+```
+This will generate a `/dist` folder, ready for deployment (Netlify, Vercel, etc.).
 
-{
-  "scripts": {
-    "install:all": "cd backend && npm install && cd ../TechnoAI-ReactJS && npm install",
-    "dev": "concurrently \"cd backend && npm run dev\" \"cd TechnoAI-ReactJS && npm run dev\"",
-    "start": "node backend/server.js"
-  },
-  "devDependencies": {
-    "concurrently": "^7.0.0"
-  }
-}
-
----
-
-## 🏗️ Build and Deploy
-
-### Frontend
-cd TechnoAI-ReactJS  
-npm run build  
-
-The production-ready files will be in `/dist`, which you can deploy on **Vercel**, **Netlify**, or any static host.
-
-### Backend
-Deploy `/backend` to **Render**, **Railway**, or **VPS**.  
-Be sure to add your environment variables on the hosting dashboard.
+### Deploy the Backend
+Upload `/backend` to Render, Railway, or your preferred hosting provider.  
+Be sure to configure all environment variables in your host’s dashboard.
 
 ---
 
@@ -158,41 +177,51 @@ Be sure to add your environment variables on the hosting dashboard.
 
 | Issue | Solution |
 |-------|-----------|
-| API not connecting | Check `VITE_API_BASE_URL` and CORS settings |
-| MongoDB connection fails | Verify `MONGO_URI` and IP whitelist |
-| .env not loading | Restart the server and verify variable names |
-| Frontend env vars undefined | Vite requires env vars to start with `VITE_` |
+| API not connecting | Check `VITE_API_BASE_URL` and CORS setup |
+| MongoDB connection fails | Verify credentials and IP whitelist |
+| `.env` not loading | Ensure correct file paths and restart server |
+| Frontend variables undefined | All Vite env vars must start with `VITE_` |
 
 ---
 
 ## 🔒 Security Tips
 
-- Never expose API keys or secrets publicly  
-- Always add `.env` and `node_modules` to `.gitignore`  
+- Never expose API keys or credentials in public repos  
+- Always include `.env` in `.gitignore`  
 - Use HTTPS in production  
-- Sanitize user inputs and validate requests  
+- Sanitize all user input  
+- Keep dependencies updated  
 
 ---
 
 ## 🧑‍💻 Contributing
 
 1. Fork the repository  
-2. Create a new branch  
-   git checkout -b feature/your-feature  
+2. Create a feature branch  
+   ```bash
+   git checkout -b feature/your-feature
+   ```
 3. Commit your changes  
-   git commit -m "Add new feature"  
-4. Push and open a Pull Request  
+   ```bash
+   git commit -m "Added new feature"
+   ```
+4. Push to your branch  
+   ```bash
+   git push origin feature/your-feature
+   ```
+5. Open a Pull Request  
 
 ---
 
 ## 🧾 .gitignore Example
 
-/node_modules  
-/dist  
-.env  
-/backend/.env  
-/TechnoAI-ReactJS/.env  
+```
+/node_modules
+/dist
+.env
+/backend/.env
 .DS_Store
+```
 
 ---
 
@@ -202,4 +231,4 @@ This project is licensed under the **MIT License**.
 ---
 
 ## 🌐 Website
-🔗 [https://techno.ai](https://techno-ai-react-js.vercel.app/)
+🔗 [techno.ai]([https://techno.ai](https://techno-ai-react-js.vercel.app/))
