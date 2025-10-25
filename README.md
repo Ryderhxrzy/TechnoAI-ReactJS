@@ -40,8 +40,8 @@ Here’s the full project structure for **TechnoAI-ReactJS**:
 │   │   └── messages.js
 │   │
 │   ├── server.js
-│   ├── package.json
-│   └── .env
+│   └── package.json
+│    
 │
 ├── /src
 │   ├── index.html
