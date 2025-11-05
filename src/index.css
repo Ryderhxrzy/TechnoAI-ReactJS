@@ -1,4 +1,7 @@
 :root {
+  /* Smooth transitions for theme switching */
+  transition: all 0.3s ease;
+  
   /* Light mode colors */
   --bg-primary: #ffffff;
   --bg-secondary: #fafafa;
@@ -85,6 +88,9 @@
 
 /* Dark mode colors */
 [data-theme="dark"] {
+  /* Ensure smooth transitions in dark mode */
+  transition: all 0.3s ease;
+  
   --bg-primary: #1E1E1E;
   --bg-secondary: #22272e;
   --bg-tertiary: #4a5568;
